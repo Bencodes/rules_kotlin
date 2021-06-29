@@ -108,12 +108,16 @@ class PersistentWorker(
   private fun TaskResult.asResponseTo(id: Int, io: IO): WorkResponse {
     return WorkResponse.newBuilder()
       .apply {
-        val cap = io.readCapturedAsUtf8String()
         // append whatever falls through standard out.
-        output = listOf(
-          log.out.toString(),
-          cap,
-        ).joinToString("\n").trim()
+        val outputLines = (
+          log.out.toString().splitToSequence("\n") +
+            io.readCapturedAsUtf8String().splitToSequence("\n")
+          )
+        output = outputLines
+          .filter { it.isNotBlank() }
+          .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+          .joinToString("\n")
+          .trim()
         exitCode = status.exit
         requestId = id
       }
