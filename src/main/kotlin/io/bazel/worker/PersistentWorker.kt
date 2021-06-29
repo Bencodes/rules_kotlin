@@ -71,7 +71,14 @@ class PersistentWorker : Worker {
     }
 
   private fun TaskResult.asResponse(pw: PrintWriter): Int {
-    pw.print(log.out.toString())
+    val filtered =
+      log.out
+        .toString()
+        .splitToSequence("\n")
+        .filter { it.isNotBlank() }
+        .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+        .joinToString("\n")
+    pw.print(filtered)
     return status.exit
   }
 }
