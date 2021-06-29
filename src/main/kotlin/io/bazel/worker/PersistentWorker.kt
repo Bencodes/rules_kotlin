@@ -114,13 +114,17 @@ class PersistentWorker(
     WorkResponse
       .newBuilder()
       .apply {
-        val cap = io.readCapturedAsUtf8String()
         // append whatever falls through standard out.
+        val outputLines = (
+          log.out.toString().splitToSequence("\n") +
+            io.readCapturedAsUtf8String().splitToSequence("\n")
+        )
         output =
-          listOf(
-            log.out.toString(),
-            cap,
-          ).joinToString("\n").trim()
+          outputLines
+            .filter { it.isNotBlank() }
+            .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+            .joinToString("\n")
+            .trim()
         exitCode = status.exit
         requestId = id
       }.build()
