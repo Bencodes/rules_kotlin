@@ -88,6 +88,7 @@ def _kotlin_toolchain_impl(ctx):
         experimental_report_unused_deps = ctx.attr.experimental_report_unused_deps,
         experimental_reduce_classpath_mode = ctx.attr.experimental_reduce_classpath_mode,
         experimental_annotation_processing_mode = ctx.attr.experimental_annotation_processing_mode,
+        experimental_ijar_header_extraction = ctx.attr.experimental_ijar_header_extraction,
         javac_options = ctx.attr.javac_options[JavacOptions] if ctx.attr.javac_options else None,
         kotlinc_options = ctx.attr.kotlinc_options[KotlincOptions] if ctx.attr.kotlinc_options else None,
         empty_jar = ctx.file._empty_jar,
@@ -211,6 +212,10 @@ _kt_toolchain = rule(
             `kt_abi_plugin_incompatible`""",
             default = False,
         ),
+        "experimental_ijar_header_extraction": attr.bool(
+            doc = """Compile interface using ijar `kt_abi_plugin_incompatible`""",
+            default = False,
+        ),
         "experimental_strict_kotlin_deps": attr.string(
             doc = "Report strict deps violations",
             default = "off",
@@ -288,6 +293,7 @@ def define_kt_toolchain(
         experimental_reduce_classpath_mode = None,
         experimental_multiplex_workers = None,
         experimental_annotation_processing_mode = None,
+        experimental_ijar_header_extraction = None,
         javac_options = Label("//kotlin/internal:default_javac_options"),
         kotlinc_options = Label("//kotlin/internal:default_kotlinc_options"),
         jacocorunner = None):
@@ -318,6 +324,11 @@ def define_kt_toolchain(
         experimental_report_unused_deps = experimental_report_unused_deps,
         experimental_reduce_classpath_mode = experimental_reduce_classpath_mode,
         experimental_annotation_processing_mode = experimental_annotation_processing_mode,
+        experimental_ijar_header_extraction = select({
+            absolute_target("//kotlin/internal:experimental_ijar_header_extraction"): True,
+            absolute_target("//kotlin/internal:noexperimental_ijar_header_extraction"): False,
+            "//conditions:default": experimental_ijar_header_extraction,
+        }),
         javac_options = javac_options,
         kotlinc_options = kotlinc_options,
         visibility = ["//visibility:public"],
@@ -356,6 +367,15 @@ def kt_configure_toolchains():
     native.config_setting(
         name = "noexperimental_use_abi_jars",
         values = {"define": "experimental_use_abi_jars=0"},
+    )
+
+    native.config_setting(
+        name = "experimental_ijar_header_extraction",
+        values = {"define": "experimental_ijar_header_extraction=1"},
+    )
+    native.config_setting(
+        name = "noexperimental_ijar_header_extraction",
+        values = {"define": "experimental_ijar_header_extraction=0"},
     )
 
     native.config_setting(

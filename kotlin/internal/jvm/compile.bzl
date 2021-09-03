@@ -707,11 +707,12 @@ def _run_kt_java_builder_actions(
         else:
             fail("Error: Unknown annotation processing mode found: `{}`".format(annotation_processor_mode))
 
+        compiled_java_jar = ctx.actions.declare_file(ctx.label.name + "-java.jar")
         java_info = java_common.compile(
             ctx,
             source_files = srcs.java,
             source_jars = generated_src_jars + srcs.src_jars,
-            output = ctx.actions.declare_file(ctx.label.name + "-java.jar"),
+            output = compiled_java_jar,
             deps = compile_deps.deps + kt_stubs_for_java,
             java_toolchain = toolchains.java,
             plugins = _plugin_mappers.targets_to_annotation_processors_java_plugin_info(ctx.attr.plugins),
@@ -719,11 +720,25 @@ def _run_kt_java_builder_actions(
             neverlink = getattr(ctx.attr, "neverlink", False),
             strict_deps = toolchains.kt.experimental_strict_kotlin_deps,
         )
+
+        # It's more efficient for our builds to just run ijar than it is to rely on java_common to compile headers
+        if toolchains.kt.experimental_ijar_header_extraction == True and not "experimental_ijar_header_extraction_incompatible" in ctx.attr.tags:
+            compiled_java_jar_ijar = java_common.run_ijar(
+                actions = ctx.actions,
+                jar = compiled_java_jar,
+                target_label = ctx.label,
+                java_toolchain = toolchains.java,
+            )
+            compile_jars = compile_jars + [
+                compiled_java_jar_ijar,
+            ]
+        else:
+            compile_jars = compile_jars + [
+                jars.ijar
+                for jars in java_info.outputs.jars
+            ]
+
         ap_generated_src_jar = java_info.annotation_processing.source_jar
-        compile_jars = compile_jars + [
-            jars.ijar
-            for jars in java_info.outputs.jars
-        ]
         output_jars = output_jars + [
             jars.class_jar
             for jars in java_info.outputs.jars
