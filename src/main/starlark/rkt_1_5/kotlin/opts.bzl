@@ -84,16 +84,6 @@ _KOPTS = {
             "all": ["-Xjvm-default=all"],
         },
     ),
-    "x_no_optimized_callable_references": struct(
-        args = dict(
-            default = False,
-            doc = "Do not use optimized callable reference superclasses. Available from 1.4.",
-        ),
-        type = attr.bool,
-        value_to_flag = {
-            True: ["-Xno-optimized-callable-reference"],
-        },
-    ),
     "x_explicit_api_mode": struct(
         args = dict(
             default = "off",
