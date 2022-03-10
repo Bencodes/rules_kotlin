@@ -88,6 +88,7 @@ def _kotlin_toolchain_impl(ctx):
         experimental_report_unused_deps = ctx.attr.experimental_report_unused_deps,
         experimental_reduce_classpath_mode = ctx.attr.experimental_reduce_classpath_mode,
         experimental_annotation_processing_mode = ctx.attr.experimental_annotation_processing_mode,
+        experimental_compile_with_transitive_deps = ctx.attr.experimental_compile_with_transitive_deps,
         javac_options = ctx.attr.javac_options[JavacOptions] if ctx.attr.javac_options else None,
         kotlinc_options = ctx.attr.kotlinc_options[KotlincOptions] if ctx.attr.kotlinc_options else None,
         empty_jar = ctx.file._empty_jar,
@@ -211,6 +212,10 @@ _kt_toolchain = rule(
             `kt_abi_plugin_incompatible`""",
             default = False,
         ),
+        "experimental_compile_with_transitive_deps": attr.bool(
+            doc = """Compile with all recursive transitive deps""",
+            default = True,
+        ),
         "experimental_strict_kotlin_deps": attr.string(
             doc = "Report strict deps violations",
             default = "off",
@@ -288,6 +293,7 @@ def define_kt_toolchain(
         experimental_reduce_classpath_mode = None,
         experimental_multiplex_workers = None,
         experimental_annotation_processing_mode = None,
+        experimental_compile_with_transitive_deps = True,
         javac_options = Label("//kotlin/internal:default_javac_options"),
         kotlinc_options = Label("//kotlin/internal:default_kotlinc_options"),
         jacocorunner = None):
@@ -318,6 +324,7 @@ def define_kt_toolchain(
         experimental_report_unused_deps = experimental_report_unused_deps,
         experimental_reduce_classpath_mode = experimental_reduce_classpath_mode,
         experimental_annotation_processing_mode = experimental_annotation_processing_mode,
+        experimental_compile_with_transitive_deps = experimental_compile_with_transitive_deps,
         javac_options = javac_options,
         kotlinc_options = kotlinc_options,
         visibility = ["//visibility:public"],
