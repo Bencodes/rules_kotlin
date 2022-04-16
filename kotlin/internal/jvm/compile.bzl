@@ -443,6 +443,7 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
     generated_src_jars = []
     annotation_processing = None
     compile_jar = ctx.actions.declare_file(ctx.label.name + ".abi.jar")
+    jdeps_output = ctx.actions.declare_file(ctx.label.name + ".jdeps")
     outputs_struct = _run_kt_java_builder_actions(
         ctx = ctx,
         rule_kind = rule_kind,
@@ -456,6 +457,7 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
         transitive_runtime_jars = transitive_runtime_jars,
         plugins = plugins,
         compile_jar = compile_jar,
+        jdeps_output = jdeps_output,
     )
     output_jars = outputs_struct.output_jars
     generated_src_jars = outputs_struct.generated_src_jars
@@ -489,7 +491,7 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
         output_jar = output_jar,
         compile_jar = compile_jar,
         source_jar = source_jar,
-        jdeps = ctx.outputs.jdeps,
+        jdeps = jdeps_output,
         deps = compile_deps.deps,
         runtime_deps = [_java_info(d) for d in ctx.attr.runtime_deps],
         exports = [_java_info(d) for d in getattr(ctx.attr, "exports", [])],
@@ -517,7 +519,7 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
             ),
             # intellij aspect needs this.
             outputs = struct(
-                jdeps = ctx.outputs.jdeps,
+                jdeps = jdeps_output,
                 jars = [struct(
                     class_jar = output_jar,
                     ijar = compile_jar,
@@ -542,7 +544,8 @@ def _run_kt_java_builder_actions(
         annotation_processors,
         transitive_runtime_jars,
         plugins,
-        compile_jar):
+        compile_jar,
+        jdeps_output):
     """Runs the necessary KotlinBuilder and JavaBuilder actions to compile a jar
 
     Returns:
@@ -599,13 +602,13 @@ def _run_kt_java_builder_actions(
             outputs = {
                 "output": kt_runtime_jar,
                 "abi_jar": kt_compile_jar,
-                "kotlin_output_jdeps": kt_jdeps,
+                "kotlin_jdeps_output": kt_jdeps,
             }
         else:
             kt_compile_jar = kt_runtime_jar
             outputs = {
                 "output": kt_runtime_jar,
-                "kotlin_output_jdeps": kt_jdeps,
+                "kotlin_jdeps_output": kt_jdeps,
             }
 
         _run_kt_builder_action(
@@ -696,7 +699,7 @@ def _run_kt_java_builder_actions(
         jdeps = jdeps,
         deps = compile_deps.deps,
         outputs = {
-            "output": ctx.outputs.jdeps,
+            "output": jdeps_output,
         },
     )
 
