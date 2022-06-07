@@ -479,6 +479,8 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
         deps = ctx.attr.deps,
         runtime_deps = ctx.attr.runtime_deps,
     )
+
+    annotation_processor_mode = ctx.attr.experimental_annotation_processing_mode or toolchains.kt.experimental_annotation_processing_mode
     annotation_processors = _plugin_mappers.targets_to_annotation_processors(ctx.attr.plugins + ctx.attr.deps)
     transitive_runtime_jars = _plugin_mappers.targets_to_transitive_runtime_jars(ctx.attr.plugins + ctx.attr.deps)
     plugins = ctx.attr.plugins + _exported_plugins(deps = ctx.attr.deps)
@@ -497,6 +499,7 @@ def kt_jvm_produce_jar_actions(ctx, rule_kind):
         associates = associates,
         compile_deps = compile_deps,
         deps_artifacts = deps_artifacts,
+        annotation_processor_mode = annotation_processor_mode,
         annotation_processors = annotation_processors,
         transitive_runtime_jars = transitive_runtime_jars,
         plugins = plugins,
@@ -585,6 +588,7 @@ def _run_kt_java_builder_actions(
         associates,
         compile_deps,
         deps_artifacts,
+        annotation_processor_mode,
         annotation_processors,
         transitive_runtime_jars,
         plugins,
@@ -599,9 +603,10 @@ def _run_kt_java_builder_actions(
     output_jars = []
     kt_stubs_for_java = []
     has_kt_sources = srcs.kt or srcs.src_jars
+    ap_generated_src_jar = None
 
     # Run KAPT
-    if has_kt_sources and annotation_processors:
+    if annotation_processor_mode == "kapt" and has_kt_sources and annotation_processors:
         kapt_outputs = _run_kapt_builder_actions(
             ctx,
             rule_kind = rule_kind,
@@ -614,6 +619,7 @@ def _run_kt_java_builder_actions(
             transitive_runtime_jars = transitive_runtime_jars,
             plugins = plugins,
         )
+        ap_generated_src_jar = kapt_outputs.ap_generated_src_jar
         generated_src_jars.append(kapt_outputs.ap_generated_src_jar)
         output_jars.append(kapt_outputs.kapt_generated_class_jar)
         kt_stubs_for_java.append(
@@ -663,7 +669,7 @@ def _run_kt_java_builder_actions(
 
         compile_jars.append(kt_compile_jar)
         output_jars.append(kt_runtime_jar)
-        if not annotation_processors or not srcs.kt:
+        if not annotation_processors or not annotation_processor_mode == "kapt" or not srcs.kt:
             kt_stubs_for_java.append(JavaInfo(compile_jar = kt_compile_jar, output_jar = kt_runtime_jar, neverlink = True))
 
         kt_java_info = JavaInfo(
@@ -685,8 +691,18 @@ def _run_kt_java_builder_actions(
 
         # Kotlin takes care of annotation processing. Note that JavaBuilder "discovers"
         # annotation processors in `deps` also.
-        if len(srcs.kt) > 0:
+        if annotation_processor_mode == "kapt" and len(srcs.kt) > 0:
             javac_opts.append("-proc:none")
+        elif annotation_processor_mode == "javac":
+            javac_opts.append("-XDcompilePolicy=simple")
+            for i in annotation_processors.to_list():
+                for jar in i.processor_jars.to_list():
+                    if "tools/napt/libnapt_java_plugin.jar" == jar.short_path:
+                        javac_opts.append("-Xplugin:Napt")
+                        break
+        else:
+            fail("Error: Unknown annotation processing mode found: `{}`".format(annotation_processor_mode))
+
         java_info = java_common.compile(
             ctx,
             source_files = srcs.java,
