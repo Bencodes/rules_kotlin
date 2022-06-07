@@ -245,7 +245,7 @@ _common_attr = utils.add_dicts(
 
             Note: Javac will be used by default if there are not Kotlin sources to compile.
             """,
-            values = ["kapt", "javac"],
+            values = ["kapt", "ksp", "javac"],
             mandatory = False,
         ),
     },

@@ -661,6 +661,14 @@ def _run_kt_java_builder_actions(
                 "kotlin_output_jdeps": kt_jdeps,
             }
 
+        kt_ksp_ap_generated_src_jar = None
+        if annotation_processors and annotation_processor_mode == "ksp":
+            # Pass in the KSP arguments
+            kt_ksp_ap_generated_src_jar = ctx.actions.declare_file(ctx.label.name + "-ksp-kt-gensrc.jar")
+            outputs.update({
+                "ksp_generated_java_srcjar": kt_ksp_ap_generated_src_jar,
+            })
+
         _run_kt_builder_action(
             ctx = ctx,
             rule_kind = rule_kind,
@@ -670,7 +678,7 @@ def _run_kt_java_builder_actions(
             associates = associates,
             compile_deps = compile_deps,
             deps_artifacts = deps_artifacts,
-            annotation_processors = [],
+            annotation_processors = [] if not kt_ksp_ap_generated_src_jar else annotation_processors,
             transitive_runtime_jars = transitive_runtime_jars,
             plugins = plugins,
             outputs = outputs,
@@ -683,6 +691,8 @@ def _run_kt_java_builder_actions(
         output_jars.append(kt_runtime_jar)
         if not annotation_processors or not annotation_processor_mode == "kapt" or not srcs.kt:
             kt_stubs_for_java.append(JavaInfo(compile_jar = kt_compile_jar, output_jar = kt_runtime_jar, neverlink = True))
+        elif annotation_processors and annotation_processor_mode == "ksp":
+            generated_src_jars.append(kt_ksp_ap_generated_src_jar)
 
         kt_java_info = JavaInfo(
             output_jar = kt_runtime_jar,
@@ -703,7 +713,7 @@ def _run_kt_java_builder_actions(
 
         # Kotlin takes care of annotation processing. Note that JavaBuilder "discovers"
         # annotation processors in `deps` also.
-        if annotation_processor_mode == "kapt" and len(srcs.kt) > 0:
+        if (annotation_processor_mode == "kapt" or annotation_processor_mode == "ksp") and len(srcs.kt) > 0:
             javac_opts.append("-proc:none")
         elif annotation_processor_mode == "javac":
             javac_opts.append("-XDcompilePolicy=simple")

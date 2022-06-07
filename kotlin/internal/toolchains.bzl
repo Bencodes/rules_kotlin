@@ -253,7 +253,7 @@ _kt_toolchain = rule(
             Note: Javac will be used by default if there are not Kotlin sources to compile.
             """,
             default = "kapt",
-            values = ["kapt", "javac"],
+            values = ["kapt", "ksp", "javac"],
         ),
         "javac_options": attr.label(
             doc = "Compiler options for javac",
