@@ -77,6 +77,8 @@ class PersistentWorker : Worker {
         .splitToSequence("\n")
         .filter { it.isNotBlank() }
         .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+        .filterNot { it.contains("[ksp] loaded provider(s): ") }
+        .filterNot { it.contains("[ksp] Found index annotation: ") }
         .joinToString("\n")
     pw.print(filtered)
     return status.exit
