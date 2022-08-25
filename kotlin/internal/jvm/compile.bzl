@@ -312,6 +312,7 @@ def _run_kapt_builder_actions(
             "kapt_generated_class_jar": kapt_generated_class_jar,
         },
         build_kotlin = False,
+        build_using_kapt = True,
         mnemonic = "KotlinKapt",
     )
 
@@ -335,6 +336,7 @@ def _run_kt_builder_action(
         plugins,
         outputs,
         build_kotlin = True,
+        build_using_kapt = False,
         mnemonic = "KotlinCompile"):
     """Creates a KotlinBuilder action invocation."""
     args = _utils.init_args(ctx, rule_kind, associates.module_name)
@@ -419,6 +421,7 @@ def _run_kt_builder_action(
     )
 
     args.add("--build_kotlin", build_kotlin)
+    args.add("--build_using_kapt", build_using_kapt)
 
     progress_message = "%s %s { kt: %d, java: %d, srcjars: %d } for %s" % (
         mnemonic,
@@ -659,11 +662,12 @@ def _run_kt_java_builder_actions(
             associates = associates,
             compile_deps = compile_deps,
             deps_artifacts = deps_artifacts,
-            annotation_processors = [],
+            annotation_processors = annotation_processors,
             transitive_runtime_jars = transitive_runtime_jars,
             plugins = plugins,
             outputs = outputs,
             build_kotlin = True,
+            build_using_kapt = False,
             mnemonic = "KotlinCompile",
         )
 

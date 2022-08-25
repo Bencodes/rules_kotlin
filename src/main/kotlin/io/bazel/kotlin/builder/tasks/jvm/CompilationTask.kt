@@ -101,6 +101,10 @@ internal fun JvmCompilationTask.plugins(
       "{generatedClasses}" to directories.generatedClasses,
       "{stubs}" to directories.stubs,
       "{generatedSources}" to directories.generatedSources,
+      "{incrementalData}" to directories.incrementalData,
+      "{stubs}" to directories.stubs,
+      "{temp}" to directories.temp,
+      "{apclasspath}" to inputs.processorpathsList.joinToString(File.pathSeparator),
     )
     options.forEach { opt ->
       val formatted = dirTokens.entries.fold(opt) { formatting, (token, value) ->
@@ -135,6 +139,8 @@ internal fun JvmCompilationTask.kaptArgs(
   context: CompilationTaskContext,
   plugins: InternalCompilerPlugins,
   aptMode: String,
+  processorsList: List<String>,
+  processorPathsList: List<String>,
 ): CompilationArgs {
   val javacArgs = mapOf<String, String>(
     "-target" to info.toolchainInfo.jvm.jvmTarget,
@@ -151,18 +157,18 @@ internal fun JvmCompilationTask.kaptArgs(
       "javacArguments" to listOf(javacArgs.let(::encodeMap)),
       "correctErrorTypes" to listOf("false"),
       "verbose" to listOf(context.whenTracing { "true" } ?: "false"),
-      "apclasspath" to inputs.processorpathsList,
+      "apclasspath" to processorPathsList,
       "aptMode" to listOf(aptMode),
     )
     val version = info.toolchainInfo.common.apiVersion.toFloat()
     when {
       version < 1.5 -> base64Encode(
         "-P",
-        *values + ("processors" to inputs.processorsList).asKeyToCommaList(),
+        *values + ("processors" to processorsList).asKeyToCommaList(),
       ) { enc -> "plugin:${plugins.kapt.id}:configuration=$enc" }
       else -> repeatFlag(
         "-P",
-        *values + ("processors" to inputs.processorsList),
+        *values + ("processors" to processorsList),
       ) { option, value ->
         "plugin:${plugins.kapt.id}:$option=$value"
       }
@@ -196,7 +202,21 @@ internal fun JvmCompilationTask.runPlugins(
             ),
           )
           .plus(
-            kaptArgs(context, plugins, "stubsAndApt"),
+            kaptArgs(
+              context = context,
+              plugins = plugins,
+              aptMode = "stubsAndApt",
+              processorsList = if (this.compileWithKapt) {
+                inputs.processorsList
+              } else {
+                emptyList()
+              },
+              processorPathsList = if (this.compileWithKapt) {
+                inputs.processorpathsList
+              } else {
+                emptyList()
+              },
+            ),
           )
         )
         .flag("-d", directories.generatedClasses)
