@@ -123,6 +123,8 @@ class PersistentWorker(
           outputLines
             .filter { it.isNotBlank() }
             .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+            .filterNot { it.contains("[ksp] loaded provider(s): ") }
+            .filterNot { it.contains("[ksp] Found index annotation: ") }
             .joinToString("\n")
             .trim()
         exitCode = status.exit
