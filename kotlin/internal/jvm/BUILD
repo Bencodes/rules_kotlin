@@ -36,6 +36,14 @@ bzl_library(
     ],
 )
 
+# Kotlin strict deps can be enabled by setting the following value on the command line
+# --@io_bazel_rules_kotlin//kotlin/internal/jvm:experimental_prune_transitive_deps=True
+bool_flag(
+    name = "experimental_prune_transitive_deps",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
+
 # Jdeps plugin can be enabled or disabled using the following flag ont the command line
 # --@io_bazel_rules_kotlin//kotlin/internal/jvm:kotlin_deps=false
 bool_flag(
