@@ -1,9 +1,3 @@
-load(
-    "@bazel_tools//tools/jdk:toolchain_utils.bzl",
-    "find_java_runtime_toolchain",
-    "find_java_toolchain",
-)
-
 # Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +19,10 @@ load(
     _TOOLCHAIN_TYPE = "TOOLCHAIN_TYPE",
 )
 load(
+    "//kotlin/internal/jvm:plugins.bzl",
+    _plugin_mappers = "mappers",
+)
+load(
     "//kotlin/internal:opts.bzl",
     "JavacOptions",
     "KotlincOptions",
@@ -36,16 +34,21 @@ load(
     _associate_utils = "associate_utils",
 )
 load(
-    "//kotlin/internal/jvm:plugins.bzl",
-    _plugin_mappers = "mappers",
+    "//kotlin/internal/utils:utils.bzl",
+    _utils = "utils",
 )
 load(
     "//kotlin/internal/utils:sets.bzl",
     _sets = "sets",
 )
 load(
-    "//kotlin/internal/utils:utils.bzl",
-    _utils = "utils",
+    "@bazel_tools//tools/jdk:toolchain_utils.bzl",
+    "find_java_runtime_toolchain",
+    "find_java_toolchain",
+)
+load(
+    "@bazel_skylib//rules:common_settings.bzl",
+    "BuildSettingInfo",
 )
 
 # UTILITY ##############################################################################################################
@@ -91,6 +94,14 @@ def _compiler_toolchains(ctx):
         java_runtime = find_java_runtime_toolchain(ctx, ctx.attr._host_javabase),
     )
 
+_MAVEN_WORKSPACED = [
+    "androidsdk",
+    "maven",
+    "maven_neverlink",
+    "maven_hacks",
+    "com_github_jetbrains_kotlin",
+]
+
 def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
     """Encapsulates jvm dependency metadata."""
     diff = _sets.intersection(
@@ -105,13 +116,22 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
     dep_infos = [_java_info(d) for d in associated_targets + deps] + [toolchains.kt.jvm_stdlibs]
 
     # Reduced classpath, exclude transitive deps from compilation
-    if (toolchains.kt.experimental_prune_transitive_deps and
+    if (ctx.attr._experimental_prune_transitive_deps[BuildSettingInfo].value and
         not "kt_experimental_prune_transitive_deps_incompatible" in ctx.attr.tags):
-        transitive = [
-            d.compile_jars
-            for d in dep_infos
-        ]
+        transitive_jars = []
+        for d in dep_infos:
+            for jar in d.transitive_compile_time_jars.to_list():
+                if jar.owner.workspace_name in _MAVEN_WORKSPACED:
+                    transitive_jars.append(jar)
+                elif "third_party/androidx.core" in jar.path:
+                    transitive_jars.append(jar)
+                elif "third_party/com.google" in jar.path:
+                    transitive_jars.append(jar)
+                elif "third_party/com.google.android.maps.navsdk" in jar.path:
+                    transitive_jars.append(jar)
+        transitive = [d.compile_jars for d in dep_infos]
     else:
+        transitive_jars = []
         transitive = [
             d.compile_jars
             for d in dep_infos
@@ -122,9 +142,8 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
 
     return struct(
         deps = dep_infos,
-        compile_jars = depset(
-            transitive = transitive,
-        ),
+        provided_deps = dep_infos,
+        compile_jars = depset(transitive_jars, transitive = transitive),
         runtime_deps = [_java_info(d) for d in runtime_deps],
     )
 
