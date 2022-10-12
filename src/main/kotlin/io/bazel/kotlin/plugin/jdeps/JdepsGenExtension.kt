@@ -50,15 +50,16 @@ import java.nio.file.Paths
 /**
  * Kotlin compiler extension that tracks classes (and corresponding classpath jars) needed to
  * compile current kotlin target. Tracked data should include all classes whose changes could
- * affect target's compilation out : direct class dependencies (i.e. external classes directly
+ * affect target's compilation out : direct class dependencies (i.e external classes directly
  * used), but also their superclass, interfaces, etc.
  * The primary use of this extension is to improve Kotlin module compilation avoidance in build
  * systems (like Buck).
  *
- * Tracking of classes and their ancestors is done via modules and class
+ * Tracking of classes is done with a Remapper, which exposes all object types used by the class
+ * bytecode being generated. Tracking of the ancestor classes is done via modules and class
  * descriptors that got generated during analysis/resolve phase of Kotlin compilation.
  *
- * Note: annotation processors dependencies may need to be tracked separately (and may not need
+ * Note: annotation processors dependencies may need to be tracked separatly (and may not need
  * per-class ABI change tracking)
  *
  * @param project the current compilation project
@@ -134,24 +135,31 @@ class JdepsGenExtension(
     ) {
       when (val resultingDescriptor = resolvedCall.resultingDescriptor) {
         is FunctionImportedFromObject -> {
-          collectTypeReferences(resultingDescriptor.containingObject.defaultType)
+          collectTypeReferences(
+            (resolvedCall.resultingDescriptor as FunctionImportedFromObject)
+              .containingObject.defaultType,
+          )
         }
         is PropertyImportedFromObject -> {
-          collectTypeReferences(resultingDescriptor.containingObject.defaultType)
+          collectTypeReferences(
+            (resolvedCall.resultingDescriptor as PropertyImportedFromObject)
+              .containingObject.defaultType,
+          )
         }
         is JavaMethodDescriptor -> {
           getClassCanonicalPath(
-            (resultingDescriptor.containingDeclaration as ClassDescriptor).typeConstructor,
+            (resultingDescriptor.containingDeclaration as ClassDescriptor)
+              .typeConstructor,
           )?.let { explicitClassesCanonicalPaths.add(it) }
         }
         is FunctionDescriptor -> {
           resultingDescriptor.returnType?.let { addImplicitDep(it) }
           resultingDescriptor.valueParameters.forEach { valueParameter ->
-            collectTypeReferences(valueParameter.type, isExplicit = false)
+            addImplicitDep(valueParameter.type)
           }
           val virtualFileClass =
-            resultingDescriptor.getContainingKotlinJvmBinaryClass() as? VirtualFileKotlinClass
-              ?: return
+            resultingDescriptor.getContainingKotlinJvmBinaryClass()
+              as? VirtualFileKotlinClass ?: return
           explicitClassesCanonicalPaths.add(virtualFileClass.file.path)
         }
         is ParameterDescriptor -> {
@@ -170,8 +178,8 @@ class JdepsGenExtension(
             )
             else -> {
               val virtualFileClass =
-                (resultingDescriptor).getContainingKotlinJvmBinaryClass() as? VirtualFileKotlinClass
-                  ?: return
+                (resultingDescriptor).getContainingKotlinJvmBinaryClass()
+                  as? VirtualFileKotlinClass ?: return
               explicitClassesCanonicalPaths.add(virtualFileClass.file.path)
             }
           }
@@ -199,9 +207,6 @@ class JdepsGenExtension(
           }
           descriptor.annotations.forEach { annotation ->
             collectTypeReferences(annotation.type)
-          }
-          descriptor.extensionReceiverParameter?.value?.type?.let {
-            collectTypeReferences(it)
           }
         }
         is PropertyDescriptor -> {
@@ -233,38 +238,28 @@ class JdepsGenExtension(
      * are other types required for compilation such as supertypes and interfaces of those explicit
      * types.
      */
-    private fun collectTypeReferences(
-      kotlinType: KotlinType,
-      isExplicit: Boolean = true,
-    ) {
-      if (isExplicit) {
-        addExplicitDep(kotlinType)
-      } else {
-        addImplicitDep(kotlinType)
+    private fun collectTypeReferences(kotlinType: KotlinType, collectSuperTypes: Boolean = true) {
+      addExplicitDep(kotlinType)
+
+      if (collectSuperTypes) {
+        kotlinType.supertypes().forEach {
+          addImplicitDep(it)
+        }
       }
 
-      kotlinType.supertypes().forEach {
-        addImplicitDep(it)
-      }
-
-      collectTypeArguments(kotlinType, isExplicit)
+      collectTypeArguments(kotlinType)
     }
 
-    private fun collectTypeArguments(
+    fun collectTypeArguments(
       kotlinType: KotlinType,
-      isExplicit: Boolean,
       visitedKotlinTypes: MutableSet<KotlinType> = mutableSetOf(),
     ) {
       visitedKotlinTypes.add(kotlinType)
       kotlinType.arguments.map { it.type }.forEach { typeArgument ->
-        if (isExplicit) {
-          addExplicitDep(typeArgument)
-        } else {
-          addImplicitDep(typeArgument)
-        }
+        addExplicitDep(typeArgument)
         typeArgument.supertypes().forEach { addImplicitDep(it) }
         if (!visitedKotlinTypes.contains(typeArgument)) {
-          collectTypeArguments(typeArgument, isExplicit, visitedKotlinTypes)
+          collectTypeArguments(typeArgument, visitedKotlinTypes)
         }
       }
     }
