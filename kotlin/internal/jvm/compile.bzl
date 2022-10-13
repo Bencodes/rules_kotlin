@@ -112,7 +112,8 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
     dep_infos = [_java_info(d) for d in associated_targets + deps] + [toolchains.kt.jvm_stdlibs]
 
     # Reduced classpath, exclude transitive deps from compilation
-    if (ctx.attr._experimental_prune_transitive_deps[BuildSettingInfo].value):
+    if (ctx.attr._experimental_prune_transitive_deps[BuildSettingInfo].value and
+        not "kt_experimental_prune_transitive_deps_incompatible" in ctx.attr.tags):
         transitive = [
             d.compile_jars
             for d in dep_infos
