@@ -114,8 +114,10 @@ class PersistentWorker(
             io.readCapturedAsUtf8String().splitToSequence("\n")
           )
         output = outputLines
+          .asSequence()
           .filter { it.isNotBlank() }
           .filterNot { it.contains("java.correct.class.type.by.place.resolve.scope") }
+          .filterNot { it.contains("[ksp] loaded provider(s): ") }
           .joinToString("\n")
           .trim()
         exitCode = status.exit
