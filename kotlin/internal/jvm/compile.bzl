@@ -89,6 +89,14 @@ def _compiler_toolchains(ctx):
         java_runtime = find_java_runtime_toolchain(ctx, ctx.attr._host_javabase),
     )
 
+_MAVEN_WORKSPACED = [
+    "androidsdk",
+    "maven",
+    "maven_neverlink",
+    "maven_hacks",
+    "com_github_jetbrains_kotlin",
+]
+
 def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
     """Encapsulates jvm dependency metadata."""
     diff = _sets.intersection(
@@ -107,6 +115,10 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
         transitive = [
             d.compile_jars
             for d in dep_infos
+        ] + [
+            d.transitive_compile_time_jars
+            for d in dep_infos
+            if d.outputs.jars[0].class_jar.owner.workspace_name in _MAVEN_WORKSPACED
         ]
     else:
         transitive = [
