@@ -20,5 +20,5 @@ load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 bool_flag(
     name = "experimental_prune_transitive_deps",
     build_setting_default = False,
-    visibility = ["//visibility:public"]
+    visibility = ["//visibility:public"],
 )
