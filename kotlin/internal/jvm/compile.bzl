@@ -791,12 +791,30 @@ def _run_kt_java_builder_actions(
         else:
             fail("Error: Unknown annotation processing mode found: `{}`".format(annotation_processor_mode))
 
+        # If toolchain flag is enabled, remove java plugin from dependencies list so that the KSP
+        # plugin don't cause javac to fail.
+        java_deps = compile_deps.deps
+        if (
+            toolchains.kt.experimental_remove_javaplugin_deps_from_java_compile_action and
+            not "experimental_remove_javaplugin_deps_from_java_compile_action_incompatible" in ctx.attr.tags
+        ):
+            filtered_deps = []
+            for p in compile_deps.deps:
+                if p.api_generating_plugins.processor_classes:
+                    # Ensure android resources jar dependencies are not mistakenly removed from deps
+                    for jar in p.compile_jars.to_list():
+                        if "base_resources.jar" in jar.path:
+                            filtered_deps.append(JavaInfo(compile_jar = jar, output_jar = jar, neverlink = True))
+                else:
+                    filtered_deps.append(p)
+            java_deps = filtered_deps
+
         java_info = java_common.compile(
             ctx,
             source_files = srcs.java,
             source_jars = generated_src_jars + srcs.src_jars,
             output = ctx.actions.declare_file(ctx.label.name + "-java.jar"),
-            deps = compile_deps.deps + kt_stubs_for_java,
+            deps = java_deps + kt_stubs_for_java,
             java_toolchain = toolchains.java,
             plugins = _plugin_mappers.targets_to_annotation_processors_java_plugin_info(ctx.attr.plugins),
             javac_opts = javac_opts,
