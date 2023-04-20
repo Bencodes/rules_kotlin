@@ -45,6 +45,10 @@ load(
     "find_java_runtime_toolchain",
     "find_java_toolchain",
 )
+load(
+    "@bazel_skylib//rules:common_settings.bzl",
+    "BuildSettingInfo",
+)
 
 # UTILITY ##############################################################################################################
 

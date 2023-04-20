@@ -13,6 +13,7 @@
 # limitations under the License.
 load("//src/main/starlark/release:packager.bzl", "release_archive")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 
 exports_files(["jetbrains-deshade.jarjar"])
 
