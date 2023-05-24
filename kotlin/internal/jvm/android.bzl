@@ -62,7 +62,7 @@ def _kt_android_artifact(
             **kwargs
         )
         exported_target_labels.append(base_name)
-    elif resource_files:
+    elif resource_files or kwargs.get("manifest", default = None):
         # Do not export deps to avoid all upstream targets to be invalidated when ABI changes.
         _android_library(
             name = base_name,
