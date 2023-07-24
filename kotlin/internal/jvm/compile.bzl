@@ -778,7 +778,7 @@ def _run_kt_java_builder_actions(
     # Build Java
     # If there is Java source or KAPT generated Java source compile that Java and fold it into
     # the final ABI jar. Otherwise just use the KT ABI jar as final ABI jar.
-    if srcs.java or generated_src_jars or srcs.src_jars:
+    if srcs.java or (generated_src_jars and not ksp_annotation_processors) or srcs.src_jars:
         javac_opts = javac_options_to_flags(toolchains.kt.javac_options)
 
         # Kotlin takes care of annotation processing. Note that JavaBuilder "discovers"
