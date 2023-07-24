@@ -114,9 +114,13 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
         )
     dep_infos = [_java_info(d) for d in associated_targets + deps] + [toolchains.kt.jvm_stdlibs]
 
+    if (ctx.attr._experimental_prune_transitive_deps[BuildSettingInfo].value and ctx.attr._experimental_prune_transitive_deps_v2[BuildSettingInfo].value):
+        fail("Error: Both experimental_prune_transitive_deps and experimental_prune_transitive_deps_v2 are enabled! Please disable one of them!")
+
     # Reduced classpath, exclude transitive deps from compilation
     if (ctx.attr._experimental_prune_transitive_deps[BuildSettingInfo].value and
         not "kt_experimental_prune_transitive_deps_incompatible" in ctx.attr.tags):
+        transitive_jars = []
         transitive = [
             d.compile_jars
             for d in dep_infos
@@ -125,7 +129,22 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
             for d in dep_infos
             if d.outputs.jars[0].class_jar.owner.workspace_name in _MAVEN_WORKSPACED
         ]
+    elif (ctx.attr._experimental_prune_transitive_deps_v2[BuildSettingInfo].value and
+          not "kt_experimental_prune_transitive_deps_incompatible" in ctx.attr.tags):
+        transitive_jars = []
+        for d in dep_infos:
+            for jar in d.transitive_compile_time_jars.to_list():
+                if jar.owner.workspace_name in _MAVEN_WORKSPACED:
+                    transitive_jars.append(jar)
+                elif "third_party/androidx.core" in jar.path:
+                    transitive_jars.append(jar)
+                elif "third_party/com.google" in jar.path:
+                    transitive_jars.append(jar)
+                elif "third_party/com.google.android.maps.navsdk" in jar.path:
+                    transitive_jars.append(jar)
+        transitive = [d.compile_jars for d in dep_infos]
     else:
+        transitive_jars = []
         transitive = [
             d.compile_jars
             for d in dep_infos
@@ -137,6 +156,7 @@ def _jvm_deps(ctx, toolchains, associated_targets, deps, runtime_deps = []):
     return struct(
         deps = dep_infos,
         compile_jars = depset(
+            transitive_jars,
             transitive = transitive,
         ),
         runtime_deps = [_java_info(d) for d in runtime_deps],

@@ -242,6 +242,11 @@ _common_attr = utils.add_dicts(
             Transitive deps required for compilation must be explicitly added""",
             default = ":experimental_prune_transitive_deps",
         ),
+        "_experimental_prune_transitive_deps_v2": attr.label(
+            doc = """If enabled, compilation is performed against only direct dependencies.
+            Transitive deps required for compilation must be explicitly added""",
+            default = ":experimental_prune_transitive_deps_v2",
+        ),
     },
 )
 

@@ -43,3 +43,11 @@ bool_flag(
     build_setting_default = False,
     visibility = ["//visibility:public"],
 )
+
+# Kotlin strict deps can be enabled by setting the following value on the command line
+# --@io_bazel_rules_kotlin//kotlin/internal/jvm:experimental_prune_transitive_deps_v2=True
+bool_flag(
+    name = "experimental_prune_transitive_deps_v2",
+    build_setting_default = False,
+    visibility = ["//visibility:public"],
+)
