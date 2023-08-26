@@ -237,6 +237,7 @@ _common_attr = utils.add_dicts(
             Transitive deps required for compilation must be explicitly added""",
             default = Label("//kotlin/settings:experimental_prune_transitive_deps"),
         ),
+        "_use_auto_exec_groups": attr.bool(default = False),
     },
 )
 
