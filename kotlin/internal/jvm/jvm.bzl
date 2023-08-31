@@ -237,6 +237,12 @@ _common_attr = utils.add_dicts(
             Transitive deps required for compilation must be explicitly added""",
             default = Label("//kotlin/settings:experimental_prune_transitive_deps"),
         ),
+        "_experimental_exclude_assocate_compile_jars_from_associates": attr.label(
+            doc = """If enabled the compile jars will be removed from the associates preventing unintended internal
+            dependencies from being leaked into dependent modules.
+            """,
+            default = Label("//kotlin/internal/jvm:experimental_exclude_assocate_compile_jars_from_associates"),
+        ),
         "_use_auto_exec_groups": attr.bool(default = False),
     },
 )
