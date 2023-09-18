@@ -767,6 +767,7 @@ def _run_kt_java_builder_actions(
     output_jars = []
     kt_stubs_for_java = []
     has_kt_sources = srcs.kt or srcs.src_jars
+    apply_napt = "napt" in ctx.attr.tags
 
     # Run KSP
     if has_kt_sources and ksp_annotation_processors:
@@ -841,13 +842,17 @@ def _run_kt_java_builder_actions(
     # Build Java
     # If there is Java source or KAPT generated Java source compile that Java and fold it into
     # the final ABI jar. Otherwise just use the KT ABI jar as final ABI jar.
-    if srcs.java or generated_kapt_src_jars or srcs.src_jars:
+    if srcs.java or generated_kapt_src_jars or srcs.src_jars or apply_napt:
         javac_opts = javac_options_to_flags(ctx.attr.javac_opts[JavacOptions] if ctx.attr.javac_opts else toolchains.kt.javac_options)
 
         # Kotlin takes care of annotation processing. Note that JavaBuilder "discovers"
         # annotation processors in `deps` also.
-        if len(srcs.kt) > 0:
+        if apply_napt:
+            javac_opts.append("-XDcompilePolicy=simple")
+            javac_opts.append("-Xplugin:Napt")
+        else:
             javac_opts.append("-proc:none")
+
         java_info = java_common.compile(
             ctx,
             source_files = srcs.java,
