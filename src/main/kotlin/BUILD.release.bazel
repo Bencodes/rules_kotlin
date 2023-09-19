@@ -15,6 +15,12 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_import")
 
 java_import(
+    name = "jvm-abi-gen",
+    jars = ["jvm-abi-gen-1.8.255-SNAPSHOT.jar"],
+    visibility = ["//visibility:public"],
+)
+
+java_import(
     name = "worker",
     jars = ["kotlin_worker.jar"],
 )
@@ -38,8 +44,8 @@ java_binary(
     name = "build",
     data = [
         ":jdeps-gen",
+        ":jvm-abi-gen",
         ":skip-code-gen",
-        "//kotlin/compiler:jvm-abi-gen",
         "//kotlin/compiler:kotlin-annotation-processing",
         "//kotlin/compiler:kotlin-compiler",
         "//kotlin/compiler:symbol-processing-api",
@@ -48,7 +54,7 @@ java_binary(
         "@com_github_jetbrains_kotlin//:home",
     ],
     jvm_flags = [
-        "-D@com_github_jetbrains_kotlin...jvm-abi-gen=$(rlocationpath //kotlin/compiler:jvm-abi-gen)",
+        "-D@com_github_jetbrains_kotlin...jvm-abi-gen=$(rlocationpath :jvm-abi-gen)",
         "-D@com_github_jetbrains_kotlin...kotlin-compiler=$(rlocationpath //kotlin/compiler:kotlin-compiler)",
         "-D@com_github_jetbrains_kotlin...kapt=$(rlocationpath //kotlin/compiler:kotlin-annotation-processing)",
         "-D@rules_kotlin...jdeps-gen=$(rlocationpath //src/main/kotlin:jdeps-gen)",

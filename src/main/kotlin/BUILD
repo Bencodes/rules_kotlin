@@ -6,6 +6,12 @@ exports_files(
     visibility = ["//src:__subpackages__"],
 )
 
+filegroup(
+    name = "jvm-abi-gen",
+    srcs = ["jvm-abi-gen-1.8.255-SNAPSHOT.jar"],
+    visibility = ["//visibility:public"],
+)
+
 jar_jar(
     name = "skip-code-gen",
     input_jar = "//src/main/kotlin/io/bazel/kotlin/plugin:skip-code-gen_deploy.jar",
@@ -43,6 +49,7 @@ release_archive(
         "//src/main/kotlin/io/bazel/kotlin/builder/cmd:build_deploy.jar": "kotlin_worker.jar",
         "//src/main/kotlin/io/bazel/kotlin/builder/cmd:merge_jdeps_deploy.jar": "jdeps_merger_worker.jar",
         "BUILD.release.bazel": "BUILD.bazel",
+        "jvm-abi-gen-1.8.255-SNAPSHOT.jar": "jvm-abi-gen-1.8.255-SNAPSHOT.jar",
     },
     deps = [
         "//src/main/kotlin/io/bazel/kotlin/compiler:pkg",
