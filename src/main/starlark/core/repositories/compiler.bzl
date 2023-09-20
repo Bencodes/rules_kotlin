@@ -59,7 +59,7 @@ kotlin_compiler_repository = repository_rule(
         ),
         "_template": attr.label(
             doc = "repository build file template",
-            default = ":BUILD.com_github_jetbrains_kotlin.bazel",
+            default = "BUILD.com_github_jetbrains_kotlin.bazel",
         ),
         "_capabilities_templates": attr.label_list(
             doc = "compiler capabilities file templates",

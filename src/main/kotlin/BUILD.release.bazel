@@ -16,7 +16,7 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_import")
 
 java_import(
     name = "jvm-abi-gen",
-    jars = ["jvm-abi-gen-1.8.255-SNAPSHOT.jar"],
+    jars = ["jvm-abi-gen-1.9.255-SNAPSHOT.jar"],
     visibility = ["//visibility:public"],
 )
 

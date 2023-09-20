@@ -8,7 +8,7 @@ exports_files(
 
 filegroup(
     name = "jvm-abi-gen",
-    srcs = ["jvm-abi-gen-1.8.255-SNAPSHOT.jar"],
+    srcs = ["jvm-abi-gen-1.9.255-SNAPSHOT.jar"],
     visibility = ["//visibility:public"],
 )
 
@@ -42,6 +42,7 @@ release_archive(
     name = "pkg",
     srcs = [
         ":jdeps-gen.jar",
+        ":jvm-abi-gen-1.9.255-SNAPSHOT.jar",
         ":skip-code-gen.jar",
     ],
     package_dir = "src/main/kotlin",  # explicitly set the package directory, as there are no parent release_archives.
@@ -49,7 +50,6 @@ release_archive(
         "//src/main/kotlin/io/bazel/kotlin/builder/cmd:build_deploy.jar": "kotlin_worker.jar",
         "//src/main/kotlin/io/bazel/kotlin/builder/cmd:merge_jdeps_deploy.jar": "jdeps_merger_worker.jar",
         "BUILD.release.bazel": "BUILD.bazel",
-        "jvm-abi-gen-1.8.255-SNAPSHOT.jar": "jvm-abi-gen-1.8.255-SNAPSHOT.jar",
     },
     deps = [
         "//src/main/kotlin/io/bazel/kotlin/compiler:pkg",
