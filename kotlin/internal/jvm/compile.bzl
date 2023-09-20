@@ -767,6 +767,7 @@ def _run_kt_java_builder_actions(
     output_jars = []
     kt_stubs_for_java = []
     has_kt_sources = srcs.kt or srcs.src_jars
+    ap_generated_src_jar = None
     apply_napt = "napt" in ctx.attr.tags
 
     # Run KSP
