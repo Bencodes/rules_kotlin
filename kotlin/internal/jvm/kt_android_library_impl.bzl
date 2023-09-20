@@ -104,7 +104,7 @@ def kt_android_produce_jar_actions(
     android_dep_infos = [_get_android_sdk_jar(ctx)]
     if rClass:
         android_dep_infos.append(rClass)
-    android_dep_infos.extend(_get_android_resource_class_jars(deps + associates + runtime_deps))
+    android_dep_infos.extend(_get_android_resource_class_jars(deps + associates))
     android_dep_infos.extend([_compile.java_info(d) for d in deps])
 
     compile_deps = _compile.jvm_deps(
