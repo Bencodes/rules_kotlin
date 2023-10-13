@@ -17,10 +17,10 @@ load(
     _compile = "compile",
     _kt_jvm_produce_output_jar_actions = "kt_jvm_produce_output_jar_actions",
 )
-load("@build_bazel_rules_android//rules:java.bzl", _java = "java")
-load("@build_bazel_rules_android//rules:processing_pipeline.bzl", _ProviderInfo = "ProviderInfo", _processing_pipeline = "processing_pipeline")
-load("@build_bazel_rules_android//rules/android_library:impl.bzl", _BASE_PROCESSORS = "PROCESSORS", _finalize = "finalize")
-load("@build_bazel_rules_android//rules:utils.bzl", _get_android_sdk = "get_android_sdk", _utils = "utils")
+load("@rules_android//rules:java.bzl", _java = "java")
+load("@rules_android//rules:processing_pipeline.bzl", _ProviderInfo = "ProviderInfo", _processing_pipeline = "processing_pipeline")
+load("@rules_android//rules/android_library:impl.bzl", _BASE_PROCESSORS = "PROCESSORS", _finalize = "finalize")
+load("@rules_android//rules:utils.bzl", _get_android_sdk = "get_android_sdk", _utils = "utils")
 
 def _process_jvm(ctx, resources_ctx, **unused_sub_ctxs):
     """Custom JvmProcessor that handles Kotlin compilation

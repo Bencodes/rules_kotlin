@@ -28,7 +28,7 @@ load(
     _kt_android_local_test_impl = "kt_android_local_test_impl",
 )
 load("//kotlin/internal/utils:utils.bzl", _utils = "utils")
-load("@build_bazel_rules_android//rules/android_local_test:attrs.bzl", _BASE_ATTRS = "ATTRS")
+load("@rules_android//rules/android_local_test:attrs.bzl", _BASE_ATTRS = "ATTRS")
 
 _ATTRS = _utils.add_dicts(_BASE_ATTRS, _kt_android_local_test_runnable_common_attr_exposed, {
     "_bazel_test_runner": attr.label(
@@ -66,7 +66,7 @@ kt_android_local_test = rule(
         AndroidIdeInfo,
     ],
     toolchains = [
-        "@build_bazel_rules_android//toolchains/android:toolchain_type",
+        "@rules_android//toolchains/android:toolchain_type",
         _TOOLCHAIN_TYPE,
         _JAVA_TOOLCHAIN_TYPE,
         _JAVA_RUNTIME_TOOLCHAIN_TYPE,

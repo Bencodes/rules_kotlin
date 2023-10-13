@@ -27,10 +27,10 @@ load(
     ":android_resources.bzl",
     _process_resources_for_android_local_test = "process_resources_for_android_local_test",
 )
-load("@build_bazel_rules_android//rules:java.bzl", _java = "java")
-load("@build_bazel_rules_android//rules:utils.bzl", _get_android_sdk = "get_android_sdk", _get_android_toolchain = "get_android_toolchain", _utils = "utils")
-load("@build_bazel_rules_android//rules:intellij.bzl", _intellij = "intellij")
-load("@build_bazel_rules_android//rules:common.bzl", _common = "common")
+load("@rules_android//rules:java.bzl", _java = "java")
+load("@rules_android//rules:utils.bzl", _get_android_sdk = "get_android_sdk", _get_android_toolchain = "get_android_toolchain", _utils = "utils")
+load("@rules_android//rules:intellij.bzl", _intellij = "intellij")
+load("@rules_android//rules:common.bzl", _common = "common")
 
 _SPLIT_STRINGS = [
     "src/test/java/",

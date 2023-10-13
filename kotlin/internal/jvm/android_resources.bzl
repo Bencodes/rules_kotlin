@@ -1,5 +1,5 @@
 load(
-    "@build_bazel_rules_android//rules/android_local_test:resources.bzl",
+    "@rules_android//rules/android_local_test:resources.bzl",
     _PROCESSORS = "PROCESSORS",
 )
 

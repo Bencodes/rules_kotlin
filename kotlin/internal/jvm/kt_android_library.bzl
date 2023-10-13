@@ -25,8 +25,8 @@ load(
     _lib_common_attr_exposed = "lib_common_attr_exposed",
 )
 load("//kotlin/internal/utils:utils.bzl", _utils = "utils")
-load("@build_bazel_rules_android//rules/android_library:rule.bzl", _make_rule = "make_rule")
-load("@build_bazel_rules_android//rules/android_library:attrs.bzl", _BASE_ATTRS = "ATTRS")
+load("@rules_android//rules/android_library:rule.bzl", _make_rule = "make_rule")
+load("@rules_android//rules/android_library:attrs.bzl", _BASE_ATTRS = "ATTRS")
 
 _ATTRS = _utils.add_dicts(_BASE_ATTRS, _lib_common_attr_exposed, {
     # Any additional custom fields that are needed go here
