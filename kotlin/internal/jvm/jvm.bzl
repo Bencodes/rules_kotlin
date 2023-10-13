@@ -234,19 +234,19 @@ _common_attr = utils.add_dicts(
         "_experimental_prune_transitive_deps": attr.label(
             doc = """If enabled, compilation is performed against only direct dependencies.
             Transitive deps required for compilation must be explicitly added""",
-            default = ":experimental_prune_transitive_deps",
+            default = Label("//kotlin/settings:experimental_prune_transitive_deps"),
         ),
         "_experimental_exclude_assocate_compile_jars_from_associates": attr.label(
             doc = """If enabled the compile jars will be removed from the associates preventing unintended internal
             dependencies from being leaked into dependent modules.
             """,
-            default = ":experimental_exclude_assocate_compile_jars_from_associates",
+            default = Label("//kotlin/internal/jvm:experimental_exclude_assocate_compile_jars_from_associates"),
         ),
         "_experimental_compile_against_associate_runtime_jar": attr.label(
             doc = """If enabled Kotlin targets will compile against the full runtime output jar of
             associated targets instead of their ABI jars.
             """,
-            default = ":experimental_compile_against_associate_runtime_jar",
+            default = Label("//kotlin/internal/jvm:experimental_compile_against_associate_runtime_jar"),
         ),
         "_use_auto_exec_groups": attr.bool(default = False),
     },
