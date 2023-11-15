@@ -8,7 +8,7 @@ exports_files(
 
 filegroup(
     name = "jvm-abi-gen",
-    srcs = ["jvm-abi-gen-1.9.255-SNAPSHOT.jar"],
+    srcs = ["jvm-abi-gen-1.9.20-removing-SourceDebugExtension.jar"],
     visibility = ["//visibility:public"],
 )
 
@@ -42,7 +42,7 @@ release_archive(
     name = "pkg",
     srcs = [
         ":jdeps-gen.jar",
-        ":jvm-abi-gen-1.9.255-SNAPSHOT.jar",
+        ":jvm-abi-gen-1.9.20-removing-SourceDebugExtension.jar",
         ":skip-code-gen.jar",
     ],
     package_dir = "src/main/kotlin",  # explicitly set the package directory, as there are no parent release_archives.
