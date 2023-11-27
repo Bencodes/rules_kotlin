@@ -865,7 +865,6 @@ def _run_kt_java_builder_actions(
             source_jars = generated_kapt_src_jars + srcs.src_jars,
             output = ctx.actions.declare_file(ctx.label.name + "-java.jar"),
             deps = compile_deps.deps + kt_stubs_for_java,
-            exports = [_java_info(d) for d in getattr(ctx.attr, "exports", [])],
             java_toolchain = toolchains.java,
             plugins = _plugin_mappers.targets_to_annotation_processors_java_plugin_info(ctx.attr.plugins),
             javac_opts = javac_opts,
