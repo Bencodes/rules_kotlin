@@ -249,6 +249,11 @@ _common_attr = utils.add_dicts(
             """,
             default = Label("//kotlin/settings:experimental_compile_against_associate_runtime_jar"),
         ),
+        "ksp_opts": attr.string_dict(
+            doc = """KSP processor options to be used when compiling this target.""",
+            default = {},
+            mandatory = False,
+        ),
         "_use_auto_exec_groups": attr.bool(default = False),
     },
 )
