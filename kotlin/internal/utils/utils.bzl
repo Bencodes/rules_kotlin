@@ -64,9 +64,47 @@ def _javac_jvm_target_flags(jvm_target, compiler_version = None):
             return ["--release", target_version]
     return ["-source", target_version, "-target", target_version]
 
+# Copied from https://github.com/bazelbuild/bazel-skylib/blob/master/lib/dicts.bzl
+# Remove it if we add a dependency on skylib.
+def _add_dicts(*dictionaries):
+    """Returns a new `dict` that has all the entries of the given dictionaries.
+    If the same key is present in more than one of the input dictionaries, the
+    last of them in the argument list overrides any earlier ones.
+    This function is designed to take zero or one arguments as well as multiple
+    dictionaries, so that it follows arithmetic identities and callers can avoid
+    special cases for their inputs: the sum of zero dictionaries is the empty
+    dictionary, and the sum of a single dictionary is a copy of itself.
+    Args:
+      *dictionaries: Zero or more dictionaries to be added.
+    Returns:
+      A new `dict` that has all the entries of the given dictionaries.
+    """
+    result = {}
+    for d in dictionaries:
+        result.update(d)
+    return result
+
+# TODO(issue/432): Remove when the toolchain dependencies are passed via flag.
+_BUILDER_REPOSITORY_LABEL = Label("//kotlin/internal/utils:utils.bzl")
+
+def _builder_workspace_name(ctx):
+    lbl = _BUILDER_REPOSITORY_LABEL.workspace_root
+    if lbl == "":
+        lbl = ctx.workspace_name
+    return lbl.replace("external/", "")
+
+def _dic_to_option_list(dic):
+    """Converts a dictionary to a list of options in the form of `key=value`"""
+    options = []
+    for key, value in dic.items():
+        options.append(key + "=" + value)
+    return options
+
 utils = struct(
     add_dicts = dicts.add,
     init_args = _init_builder_args,
     derive_module_name = _derive_module_name,
     javac_jvm_target_flags = _javac_jvm_target_flags,
+    builder_workspace_name = _builder_workspace_name,
+    dic_to_option_list = _dic_to_option_list,
 )

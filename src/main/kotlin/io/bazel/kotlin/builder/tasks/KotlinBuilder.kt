@@ -87,6 +87,7 @@ class KotlinBuilder(
       REDUCED_CLASSPATH_MODE("--reduced_classpath_mode"),
       INSTRUMENT_COVERAGE("--instrument_coverage"),
       BUILD_TOOLS_API("--build_tools_api"),
+      KSP_OPTS("--ksp_opts"),
     }
   }
 
@@ -154,6 +155,7 @@ class KotlinBuilder(
           check(it.isNotBlank()) { "--kotlin_module_name should not be blank" }
         }
       addAllPassthroughFlags(argMap.optional(KotlinBuilderFlags.PASSTHROUGH_FLAGS) ?: emptyList())
+      addAllKspOpts(argMap.optional(KotlinBuilderFlags.KSP_OPTS) ?: emptyList())
 
       argMap.optional(KotlinBuilderFlags.FRIEND_PATHS)?.let(::addAllFriendPaths)
       toolchainInfoBuilder.commonBuilder.apiVersion =
