@@ -27,8 +27,6 @@ load(
 )
 load(
     "//kotlin/internal:defs.bzl",
-    _JAVA_RUNTIME_TOOLCHAIN_TYPE = "JAVA_RUNTIME_TOOLCHAIN_TYPE",
-    _JAVA_TOOLCHAIN_TYPE = "JAVA_TOOLCHAIN_TYPE",
     _KtCompilerPluginInfo = "KtCompilerPluginInfo",
     _KtJvmInfo = "KtJvmInfo",
     _KtPluginConfiguration = "KtPluginConfiguration",
@@ -485,6 +483,7 @@ def _run_kt_builder_action(
     kotlinc_options = ctx.attr.kotlinc_opts[KotlincOptions] if ctx.attr.kotlinc_opts else toolchains.kt.kotlinc_options
     javac_options = ctx.attr.javac_opts[JavacOptions] if ctx.attr.javac_opts else toolchains.kt.javac_options
 
+    ksp_opts = ctx.attr.ksp_opts if ctx.attr.ksp_opts else None
     args = _utils.init_args(ctx, rule_kind, compile_deps.module_name, kotlinc_options)
 
     for f, path in outputs.items():
@@ -563,6 +562,12 @@ def _run_kt_builder_action(
 
     if not "kt_remove_debug_info_in_abi_plugin_incompatible" in ctx.attr.tags and toolchains.kt.experimental_remove_debug_info_in_abi_jars == True:
         args.add("--remove_debug_info_in_abi_jar", "true")
+
+    if ksp_opts:
+        args.add_all(
+            "--ksp_opts",
+            _utils.dic_to_option_list(ksp_opts),
+        )
 
     args.add("--build_kotlin", build_kotlin)
 
@@ -802,6 +807,7 @@ def _run_kt_java_builder_actions(
     output_jars = []
     kt_stubs_for_java = []
     has_kt_sources = srcs.kt or srcs.src_jars
+    ap_generated_src_jar = None
 
     # Run KAPT
     if has_kt_sources and annotation_processors:
