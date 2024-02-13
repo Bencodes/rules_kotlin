@@ -910,10 +910,10 @@ def _run_kt_java_builder_actions(
             )
 
     annotation_processing = None
-    if annotation_processors:
+    if annotation_processors or ksp_annotation_processors:
         outputs_list = [java_info.outputs for java_info in java_infos]
         annotation_processing = _create_annotation_processing(
-            annotation_processors = annotation_processors,
+            annotation_processors = annotation_processors or ksp_annotation_processors,
             ap_class_jar = [jars.class_jar for outputs in outputs_list for jars in outputs.jars][0],
             ap_source_jar = ap_generated_src_jar,
         )
