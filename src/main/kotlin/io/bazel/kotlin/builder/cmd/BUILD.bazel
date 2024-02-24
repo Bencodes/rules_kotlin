@@ -1,11 +1,5 @@
 load("//src/main/kotlin:bootstrap.bzl", "kt_bootstrap_binary", "kt_bootstrap_library")
 
-java_import(
-    name = "jvm-abi-gen",
-    jars = ["//src/main/kotlin:jvm-abi-gen"],
-    visibility = ["//visibility:public"],
-)
-
 kt_bootstrap_library(
     name = "build_lib",
     srcs = ["Build.kt"],
@@ -21,7 +15,7 @@ kt_bootstrap_library(
 kt_bootstrap_binary(
     name = "build",
     data = [
-        ":jvm-abi-gen",
+        "//kotlin/compiler:jvm-abi-gen",
         "//kotlin/compiler:kotlin-annotation-processing",
         "//kotlin/compiler:kotlin-compiler",
         "//kotlin/compiler:kotlin-reflect",
@@ -33,7 +27,7 @@ kt_bootstrap_binary(
         "@com_github_jetbrains_kotlin//:home",
     ],
     jvm_flags = [
-        "-D@com_github_jetbrains_kotlin...jvm-abi-gen=$(rlocationpath :jvm-abi-gen)",
+        "-D@com_github_jetbrains_kotlin...jvm-abi-gen=$(rlocationpath //kotlin/compiler:jvm-abi-gen)",
         "-D@com_github_jetbrains_kotlin...kotlin-compiler=$(rlocationpath //kotlin/compiler:kotlin-compiler)",
         "-D@com_github_jetbrains_kotlin...kapt=$(rlocationpath //kotlin/compiler:kotlin-annotation-processing)",
         "-D@rules_kotlin...jdeps-gen=$(rlocationpath //src/main/kotlin:jdeps-gen)",
