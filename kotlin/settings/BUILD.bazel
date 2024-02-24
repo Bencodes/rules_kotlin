@@ -37,7 +37,7 @@ bool_flag(
 )
 
 # Kotlin strict deps can be enabled by setting the following value on the command line
-# --@rules_kotlin//kotlin/settings:experimental_exclude_assocate_compile_jars_from_associates=True
+# --@io_bazel_rules_kotlin//kotlin/internal/jvm:experimental_exclude_assocate_compile_jars_from_associates=True
 bool_flag(
     name = "experimental_exclude_assocate_compile_jars_from_associates",
     build_setting_default = False,
