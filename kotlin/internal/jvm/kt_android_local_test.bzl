@@ -71,7 +71,7 @@ kt_android_local_test = rule(
         _JAVA_TOOLCHAIN_TYPE,
         _JAVA_RUNTIME_TOOLCHAIN_TYPE,
     ],
-    fragments = ["android", "java"],  # Required fragments of the target configuration
+    fragments = ["android", "java", "bazel_android"],  # Required fragments of the target configuration
     host_fragments = ["java"],  # Required fragments of the host configuration
     implementation = _kt_android_local_test_impl,
 )
