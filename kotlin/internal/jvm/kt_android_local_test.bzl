@@ -67,6 +67,7 @@ kt_android_local_test = rule(
     ],
     toolchains = [
         "@rules_android//toolchains/android:toolchain_type",
+        "@rules_android//toolchains/android_sdk:toolchain_type",
         _TOOLCHAIN_TYPE,
         _JAVA_TOOLCHAIN_TYPE,
         _JAVA_RUNTIME_TOOLCHAIN_TYPE,
