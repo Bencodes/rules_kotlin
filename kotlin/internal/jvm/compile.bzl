@@ -1,3 +1,13 @@
+load(
+    "@bazel_skylib//rules:common_settings.bzl",
+    "BuildSettingInfo",
+)
+load(
+    "@bazel_tools//tools/jdk:toolchain_utils.bzl",
+    "find_java_runtime_toolchain",
+    "find_java_toolchain",
+)
+
 # Copyright 2018 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,10 +29,6 @@ load(
     _TOOLCHAIN_TYPE = "TOOLCHAIN_TYPE",
 )
 load(
-    "//kotlin/internal/jvm:plugins.bzl",
-    _plugin_mappers = "mappers",
-)
-load(
     "//kotlin/internal:opts.bzl",
     "JavacOptions",
     "KotlincOptions",
@@ -34,21 +40,16 @@ load(
     _associate_utils = "associate_utils",
 )
 load(
-    "//kotlin/internal/utils:utils.bzl",
-    _utils = "utils",
+    "//kotlin/internal/jvm:plugins.bzl",
+    _plugin_mappers = "mappers",
 )
 load(
     "//kotlin/internal/utils:sets.bzl",
     _sets = "sets",
 )
 load(
-    "@bazel_tools//tools/jdk:toolchain_utils.bzl",
-    "find_java_runtime_toolchain",
-    "find_java_toolchain",
-)
-load(
-    "@bazel_skylib//rules:common_settings.bzl",
-    "BuildSettingInfo",
+    "//kotlin/internal/utils:utils.bzl",
+    _utils = "utils",
 )
 
 # UTILITY ##############################################################################################################
@@ -716,7 +717,7 @@ def kt_jvm_produce_output_jar_actions(
     instrumented_files = coverage_common.instrumented_files_info(
         ctx,
         source_attributes = ["srcs"],
-        dependency_attributes = ["deps", "exports", "associates"],
+        dependency_attributes = ["associates", "deps", "exports"],
         extensions = ["kt", "java"],
     )
 
@@ -995,7 +996,7 @@ def export_only_providers(ctx, actions, attr, outputs):
         instrumented_files = coverage_common.instrumented_files_info(
             ctx,
             source_attributes = ["srcs"],
-            dependency_attributes = ["deps", "exports", "associates"],
+            dependency_attributes = ["associates", "deps", "exports"],
             extensions = ["kt", "java"],
         ),
     )
