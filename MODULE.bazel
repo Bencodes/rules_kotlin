@@ -77,7 +77,9 @@ maven.install(
         "com.squareup.moshi:moshi-kotlin-codegen:1.15.0",
         "com.google.auto.service:auto-service-annotations:jar:1.1.1",
     ],
+    fail_if_repin_required = True,
     fetch_sources = True,
+    lock_file = "//:kotlin_rules_maven_install.json",
     repositories = [
         "https://maven-central.storage.googleapis.com/repos/central/data/",
         "https://maven.google.com",
