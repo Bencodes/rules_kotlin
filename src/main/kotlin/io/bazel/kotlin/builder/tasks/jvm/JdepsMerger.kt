@@ -98,13 +98,13 @@ class JdepsMerger {
         // so we need to make sure wedon't mart the dependency as unused
         // unless all of the jars are unused.
         dependencyMap.values.forEach {
-          var label = readJarOwnerFromManifest(Paths.get(it.path)).label
-          if (label != null) {
-            if (label.startsWith("@@") || label.startsWith("@/")) {
-              label = label.substring(1)
+          var jarLabel = readJarOwnerFromManifest(Paths.get(it.path)).label
+          if (jarLabel != null) {
+            if (jarLabel.startsWith("@@") || jarLabel.startsWith("@/")) {
+              jarLabel = jarLabel.substring(1)
             }
-            if (kindMap.getOrDefault(label, Deps.Dependency.Kind.UNUSED) >= it.kind) {
-              kindMap.put(label, it.kind)
+            if (kindMap.getOrDefault(jarLabel, Deps.Dependency.Kind.UNUSED) >= it.kind) {
+              kindMap.put(jarLabel, it.kind)
             }
           }
         }
@@ -120,9 +120,11 @@ class JdepsMerger {
             val open = "\u001b[35m\u001b[1m"
             val close = "\u001b[0m"
             return@info """
-            |$open ** Please remove the following dependencies:$close ${unusedLabels.joinToString(
-              " ",
-            )} from $label 
+            |$open ** Please remove the following dependencies:$close ${
+              unusedLabels.joinToString(
+                " ",
+              )
+            } from $label 
             |$open ** You can use the following buildozer command:$close buildozer 'remove deps ${
               unusedLabels.joinToString(" ")
             }' $label
