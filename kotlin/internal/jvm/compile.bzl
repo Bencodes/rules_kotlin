@@ -552,6 +552,8 @@ def _run_kt_builder_action(
     args.add("--strict_kotlin_deps", toolchains.kt.experimental_strict_kotlin_deps)
     args.add_all("--classpath", compile_deps.compile_jars)
     args.add("--reduced_classpath_mode", toolchains.kt.experimental_reduce_classpath_mode)
+    args.add("--treat_internal_as_private_in_abi_jar", toolchains.kt.experimental_treat_internal_as_private_in_abi_jars)
+    args.add("--remove_private_classes_in_abi_jar", toolchains.kt.experimental_remove_private_classes_in_abi_jars)
     args.add_all("--sources", srcs.all_srcs, omit_if_empty = True)
     args.add_all("--source_jars", srcs.src_jars + generated_src_jars, omit_if_empty = True)
     args.add_all("--deps_artifacts", deps_artifacts, omit_if_empty = True)
@@ -902,7 +904,7 @@ def _run_kt_java_builder_actions(
 
         compile_jars.append(kt_compile_jar)
         output_jars.append(kt_runtime_jar)
-        kt_stubs_for_java.append(JavaInfo(compile_jar = kt_compile_jar, output_jar = kt_runtime_jar, neverlink = True))
+        kt_stubs_for_java.append(JavaInfo(compile_jar = kt_runtime_jar, output_jar = kt_runtime_jar, neverlink = True))
 
         kt_java_info = JavaInfo(
             output_jar = kt_runtime_jar,

@@ -77,6 +77,8 @@ internal constructor(
       DEBUG("--kotlin_debug_tags"),
       TASK_ID("--kotlin_task_id"),
       ABI_JAR("--abi_jar"),
+      ABI_JAR_INTERNAL_AS_PRIVATE("--treat_internal_as_private_in_abi_jar"),
+      ABI_JAR_REMOVE_PRIVATE_CLASSES("--remove_private_classes_in_abi_jar"),
       GENERATED_JAVA_SRC_JAR("--generated_java_srcjar"),
       GENERATED_JAVA_STUB_JAR("--kapt_generated_stub_jar"),
       GENERATED_CLASS_JAR("--kapt_generated_class_jar"),
@@ -163,6 +165,12 @@ internal constructor(
         argMap.mandatorySingle(KotlinBuilderFlags.LANGUAGE_VERSION)
       strictKotlinDeps = argMap.mandatorySingle(KotlinBuilderFlags.STRICT_KOTLIN_DEPS)
       reducedClasspathMode = argMap.mandatorySingle(KotlinBuilderFlags.REDUCED_CLASSPATH_MODE)
+      argMap.optionalSingle(KotlinBuilderFlags.ABI_JAR_INTERNAL_AS_PRIVATE)?.let {
+        treatInternalAsPrivateInAbiJar = it == "true"
+      }
+      argMap.optionalSingle(KotlinBuilderFlags.ABI_JAR_REMOVE_PRIVATE_CLASSES)?.let {
+        removePrivateClassesInAbiJar = it == "true"
+      }
       this
     }
 
