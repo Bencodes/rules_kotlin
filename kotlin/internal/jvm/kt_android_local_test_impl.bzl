@@ -148,7 +148,10 @@ def _process_jvm(ctx, resources_ctx, **unused_sub_ctxs):
         ),
         outputs = outputs,
     )
-    java_info = java_common.add_constraints(providers.java, "android")
+
+    java_info = providers.java
+    if getattr(java_common, "add_constraints", None):
+        java_info = java_common.add_constraints(java_info, constraints = ["android"])
 
     # Create test run action
     providers = [providers.kt, java_info]
