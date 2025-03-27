@@ -18,6 +18,9 @@ load("//src/main/starlark/core/options:convert.bzl", "convert")
 def _map_optin_class_to_flag(values):
     return ["-opt-in=%s" % v for v in values]
 
+def _map_suppress_warning_to_flag(values):
+    return ["-Xsuppress-warning=%s" % v for v in values]
+
 def _map_backend_threads_to_flag(n):
     if n == 1:
         return None
@@ -256,6 +259,15 @@ _KOPTS_ALL = {
         type = attr.string_list,
         value_to_flag = None,
         map_value_to_flag = _map_optin_class_to_flag,
+    ),
+    "x_suppress_warning": struct(
+        args = dict(
+            default = [],
+            doc = "Define APIs to opt-in to.",
+        ),
+        type = attr.string_list,
+        value_to_flag = None,
+        map_value_to_flag = _map_suppress_warning_to_flag,
     ),
     "x_use_fir": struct(
         # 1.6
