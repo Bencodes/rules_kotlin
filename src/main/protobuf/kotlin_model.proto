@@ -92,6 +92,10 @@ message CompilationTaskInfo {
     bool remove_debug_info = 15;
     // KSP plugin options.
     repeated string ksp_opts = 16;
+    // Preserve the ABI declaration order
+    bool preserve_declaration_order = 17;
+    // Remove the copy function when data classes have private constructors from the ABI
+    bool remove_data_class_copy_if_constructor_is_private = 18;
 }
 
 // Nested messages not marked with stable could be refactored.
