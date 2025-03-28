@@ -545,6 +545,13 @@ def _run_kt_builder_action(
     for f, path in outputs.items():
         args.add("--" + f, path)
 
+    experimental_preserve_declaration_order = toolchains.kt.experimental_preserve_declaration_order
+    if 'kt_experimental_preserve_declaration_order_in_abi_plugin_incompatible' in ctx.attr.tags:
+        experimental_preserve_declaration_order = False
+    experimental_remove_data_class_copy_if_constructor_is_private = toolchains.kt.experimental_remove_data_class_copy_if_constructor_is_private
+    if 'kt_experimental_preserve_declaration_order_in_abi_plugin_incompatible' in ctx.attr.tags:
+        experimental_remove_data_class_copy_if_constructor_is_private = False
+
     # Unwrap kotlinc_options/javac_options options or default to the ones being provided by the toolchain
     args.add_all("--kotlin_passthrough_flags", kotlinc_options_to_flags(kotlinc_options))
     args.add_all("--javacopts", javac_options_to_flags(javac_options))
@@ -554,6 +561,8 @@ def _run_kt_builder_action(
     args.add("--reduced_classpath_mode", toolchains.kt.experimental_reduce_classpath_mode)
     args.add("--treat_internal_as_private_in_abi_jar", toolchains.kt.experimental_treat_internal_as_private_in_abi_jars)
     args.add("--remove_private_classes_in_abi_jar", toolchains.kt.experimental_remove_private_classes_in_abi_jars)
+    args.add("--preserve_declaration_order", experimental_preserve_declaration_order)
+    args.add("--remove_data_class_copy_if_constructor_is_private", experimental_remove_data_class_copy_if_constructor_is_private)
     args.add_all("--sources", srcs.all_srcs, omit_if_empty = True)
     args.add_all("--source_jars", srcs.src_jars + generated_src_jars, omit_if_empty = True)
     args.add_all("--deps_artifacts", deps_artifacts, omit_if_empty = True)

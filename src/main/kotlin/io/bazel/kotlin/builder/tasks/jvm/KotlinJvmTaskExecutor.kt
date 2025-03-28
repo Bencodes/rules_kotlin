@@ -93,6 +93,12 @@ class KotlinJvmTaskExecutor
                             if (info.removePrivateClassesInAbiJar) {
                               flag("removePrivateClasses", "true")
                             }
+                            if (info.preserveDeclarationOrder) {
+                              flag("preserveDeclarationOrder", "true")
+                            }
+                            if (info.removeDataClassCopyIfConstructorIsPrivate) {
+                              flag("removeDataClassCopyIfConstructorIsPrivate", "true")
+                            }
                           }
                           given(outputs.jar).empty {
                             plugin(plugins.skipCodeGen)
