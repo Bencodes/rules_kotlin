@@ -43,7 +43,7 @@ load(
 _ATTRS = _utils.add_dicts(_BASE_ATTRS, _runnable_common_attr_exposed, {
     "main_class": attr.string(default = "com.google.testing.junit.runner.BazelTestRunner"),
     "jacocorunner": attr.label(
-        default = Label("@bazel_tools//tools/jdk:JacocoCoverage"),
+        default = Label("@remote_java_tools//:jacoco_coverage_runner"),
     ),
     "_lcov_merger": attr.label(
         cfg = "exec",
