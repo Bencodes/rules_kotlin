@@ -40,6 +40,5 @@ java_library(
     exports = [
         ":deps_java_proto",
         ":kotlin_model_java_proto",
-        ":worker_protocol_java_proto",
     ],
 )
