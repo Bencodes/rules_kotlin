@@ -78,7 +78,9 @@ def _kotlin_toolchain_impl(ctx):
         jvm_stdlibs = java_common.merge(compile_time_providers + runtime_providers),
         jvm_emit_jdeps = ctx.attr._jvm_emit_jdeps[BuildSettingInfo].value,
         execution_requirements = {
+            "supports-multiplex-sandboxing": "1" if ctx.attr.experimental_multiplex_sandboxing else "0",
             "supports-multiplex-workers": "1" if ctx.attr.experimental_multiplex_workers else "0",
+            "supports-path-mapping": "1" if ctx.attr.supports_path_mapping else "0",
             "supports-workers": "1",
         },
         experimental_use_abi_jars = ctx.attr.experimental_use_abi_jars,
@@ -159,6 +161,10 @@ _kt_toolchain = rule(
         ),
         "experimental_kover_exclude_inherited_from": attr.string_list(
             doc = """List of annotation exclusions from inherited classes to use when generating kover reports.""",
+        ),
+        "experimental_multiplex_sandboxing": attr.bool(
+            doc = """Run workers with multiplex sandboxing.""",
+            default = False,
         ),
         "experimental_multiplex_workers": attr.bool(
             doc = """Run workers in multiplex mode.""",
@@ -309,6 +315,10 @@ _kt_toolchain = rule(
                 "2.3",
             ],
         ),
+        "supports_path_mapping": attr.bool(
+            doc = """Enable path mapping for Kotlin actions. Requires experimental_multiplex_sandboxing.""",
+            default = False,
+        ),
         "_empty_jar": attr.label(
             doc = """Empty jar for exporting JavaInfos.""",
             allow_single_file = True,
@@ -375,6 +385,8 @@ def define_kt_toolchain(
         experimental_report_unused_deps = None,
         experimental_reduce_classpath_mode = None,
         experimental_multiplex_workers = None,
+        experimental_multiplex_sandboxing = None,
+        supports_path_mapping = None,
         experimental_build_tools_api = None,
         experimental_kover_enabled = False,
         experimental_kover_agent = None,
@@ -409,6 +421,8 @@ def define_kt_toolchain(
         experimental_preserve_declaration_order = experimental_preserve_declaration_order,
         experimental_remove_data_class_copy_if_constructor_is_private = experimental_remove_data_class_copy_if_constructor_is_private,
         experimental_multiplex_workers = experimental_multiplex_workers,
+        experimental_multiplex_sandboxing = experimental_multiplex_sandboxing,
+        supports_path_mapping = supports_path_mapping,
         experimental_strict_kotlin_deps = experimental_strict_kotlin_deps,
         experimental_report_unused_deps = experimental_report_unused_deps,
         experimental_reduce_classpath_mode = experimental_reduce_classpath_mode,
