@@ -31,6 +31,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.jar.JarEntry
+import java.util.concurrent.ConcurrentHashMap
 import java.util.jar.JarOutputStream
 import java.util.jar.Manifest
 import java.util.regex.Pattern
@@ -50,6 +51,15 @@ import java.util.zip.ZipFile
 class Ksp2Task : Work {
   companion object {
     private val FLAGFILE_RE = Pattern.compile("""^--flagfile=((.*)-(\d+).params)$""").toRegex()
+
+    /**
+     * Cache of isolated KSP2 classloaders keyed by processor classpath, shared across
+     * persistent-worker invocations in this JVM. Each URLClassLoader defines tens of
+     * thousands of KSP/kotlin-compiler classes; without caching, every worker action
+     * accumulates that many fresh class metadata entries in the compressed class space
+     * until the JVM OOMs. See KT-84566 / google/ksp#2817.
+     */
+    private val kspClassLoaderCache = ConcurrentHashMap<String, URLClassLoader>()
 
     enum class Ksp2Flags(
       override val flag: String,
@@ -174,10 +184,16 @@ class Ksp2Task : Work {
         sourceRoots.add(stagedSourcesDir.toString())
       }
 
-      // Create classloader with KSP2 jars and processor jars
+      // Look up (or create) the cached classloader for this processor classpath.
+      // Reusing the loader across worker invocations is what prevents the compressed-
+      // class-space leak; see kspClassLoaderCache docs above.
       val processorClasspath = argMap.optional(Ksp2Flags.PROCESSOR_CLASSPATH) ?: emptyList()
-      val processorUrls = processorClasspath.map { File(it).toURI().toURL() }.toTypedArray()
-      val kspClassLoader = URLClassLoader(processorUrls, ClassLoader.getSystemClassLoader())
+      val cacheKey = processorClasspath.sorted().joinToString(File.pathSeparator)
+      val kspClassLoader =
+        kspClassLoaderCache.computeIfAbsent(cacheKey) {
+          val urls = processorClasspath.map { File(it).toURI().toURL() }.toTypedArray()
+          URLClassLoader(urls, ClassLoader.getSystemClassLoader())
+        }
 
       val processorOptions = parseKspOptions(argMap.optional(Ksp2Flags.KSP_OPTIONS) ?: emptyList())
 
