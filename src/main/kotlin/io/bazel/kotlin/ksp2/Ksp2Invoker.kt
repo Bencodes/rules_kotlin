@@ -92,39 +92,4 @@ class Ksp2Invoker(
 
     return ksp.execute().code
   }
-
-  /**
-   * Shut down kotlinx-coroutines dispatchers loaded inside this invoker's classloader.
-   *
-   * Workaround for KT-84566 / google/ksp#2817. Only runs if kotlinx-coroutines is
-   * actually owned by [classLoader]; if it lives in a parent (e.g. on the worker's
-   * system classpath), `DefaultScheduler.INSTANCE` is a process-wide singleton shared
-   * across all requests and shutting it down would break subsequent invocations with
-   * RejectedExecutionException.
-   *
-   * The IntelliJ kotlinx-coroutines variant bundled with KSP2 does not expose the
-   * public `Dispatchers.shutdown()` extension, so we call the internal entry points
-   * directly. Resolved reflectively because kotlinx-coroutines-core is not on
-   * Ksp2Invoker's compile classpath.
-   */
-  fun shutdown() {
-    try {
-      val scheduler = Class.forName("kotlinx.coroutines.scheduling.DefaultScheduler", true, classLoader)
-      if (scheduler.classLoader === classLoader) {
-        val instance = scheduler.getField("INSTANCE").get(null)
-        scheduler.getMethod("shutdown\$kotlinx_coroutines_core").invoke(instance)
-      }
-    } catch (t: Throwable) {
-      System.err.println("KSP2 DefaultScheduler shutdown skipped/failed: $t")
-    }
-    try {
-      val executor = Class.forName("kotlinx.coroutines.DefaultExecutor", true, classLoader)
-      if (executor.classLoader === classLoader) {
-        val instance = executor.getField("INSTANCE").get(null)
-        executor.getMethod("shutdown").invoke(instance)
-      }
-    } catch (t: Throwable) {
-      System.err.println("KSP2 DefaultExecutor shutdown skipped/failed: $t")
-    }
-  }
 }
