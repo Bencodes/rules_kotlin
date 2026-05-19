@@ -119,6 +119,7 @@ class KotlinBuilder
         status = ex.status
       } catch (throwable: Throwable) {
         taskContext.error(throwable) { "Uncaught exception" }
+        status = 1
       } finally {
         compileContext.finalize(success)
       }
