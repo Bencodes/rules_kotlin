@@ -4,58 +4,57 @@
     "com.eed3si9n.jarjar:jarjar": 1150382395,
     "com.google.auto.service:auto-service": -1729498094,
     "com.google.auto.service:auto-service-annotations": -843120535,
-    "com.google.auto.value:auto-value": 1146221104,
-    "com.google.auto.value:auto-value-annotations": -1101276935,
+    "com.google.auto.value:auto-value": 1135718000,
+    "com.google.auto.value:auto-value-annotations": -1111780039,
     "com.google.code.findbugs:jsr305": 495355163,
-    "com.google.code.gson:gson": -1146526807,
-    "com.google.dagger:dagger": 1304516772,
-    "com.google.dagger:dagger-compiler": 1028126946,
-    "com.google.dagger:dagger-producers": -860209456,
-    "com.google.errorprone:error_prone_annotations": -571311395,
-    "com.google.guava:guava": -704445974,
-    "com.google.protobuf:protobuf-java": 1906581597,
-    "com.google.protobuf:protobuf-java-util": -1626074784,
+    "com.google.dagger:dagger": 1709842079,
+    "com.google.dagger:dagger-compiler": 1433452253,
+    "com.google.dagger:dagger-producers": -454884149,
+    "com.google.guava:guava": -1952789938,
+    "com.google.protobuf:protobuf-java": -1260989606,
+    "com.google.protobuf:protobuf-java-util": -498678691,
     "com.google.truth:truth": -157380267,
-    "com.squareup.moshi:moshi": 623265116,
-    "com.squareup.moshi:moshi-kotlin": -1806344484,
-    "com.squareup.moshi:moshi-kotlin-codegen": 2002404690,
+    "com.squareup.moshi:moshi": -1864247717,
+    "com.squareup.moshi:moshi-kotlin": 1109979,
+    "com.squareup.moshi:moshi-kotlin-codegen": -485108143,
     "dev.zacsweers.autoservice:auto-service-ksp": 34153974,
     "javax.annotation:javax.annotation-api": 1286517389,
     "javax.inject:javax.inject": -297932879,
     "junit:junit": 373369075,
     "org.apache.commons:commons-compress": -1310119682,
     "org.codehaus.plexus:plexus-utils": 1634344571,
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": 17228464,
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core": 1254427323,
+    "org.ow2.asm:asm": -1147174173,
+    "org.ow2.asm:asm-commons": -1607600600,
+    "org.ow2.asm:asm-tree": 710692824,
     "repositories": 582576641
   },
   "__RESOLVED_ARTIFACTS_HASH": {
-    "com.eed3si9n.jarjar:jarjar": 1838835399,
+    "com.eed3si9n.jarjar:jarjar": -1998728233,
     "com.eed3si9n.jarjar:jarjar:jar:sources": 903276703,
     "com.google.auto.service:auto-service": -1487611887,
     "com.google.auto.service:auto-service-annotations": 262983930,
     "com.google.auto.service:auto-service-annotations:jar:sources": -1392999316,
     "com.google.auto.service:auto-service:jar:sources": -1296332334,
-    "com.google.auto.value:auto-value": 1110951021,
-    "com.google.auto.value:auto-value-annotations": 641018093,
-    "com.google.auto.value:auto-value-annotations:jar:sources": -315473772,
-    "com.google.auto.value:auto-value:jar:sources": 1982175049,
+    "com.google.auto.value:auto-value": 190999831,
+    "com.google.auto.value:auto-value-annotations": 1937922987,
+    "com.google.auto.value:auto-value-annotations:jar:sources": -2013114563,
+    "com.google.auto.value:auto-value:jar:sources": 1759774465,
     "com.google.auto:auto-common": -1425245725,
     "com.google.auto:auto-common:jar:sources": -542679945,
     "com.google.code.findbugs:jsr305": 870839855,
     "com.google.code.findbugs:jsr305:jar:sources": -935881202,
-    "com.google.code.gson:gson": 50257904,
-    "com.google.code.gson:gson:jar:sources": 275910111,
-    "com.google.dagger:dagger": 875179613,
-    "com.google.dagger:dagger-compiler": 1511246626,
-    "com.google.dagger:dagger-compiler:jar:sources": 671838778,
-    "com.google.dagger:dagger-producers": 56284338,
-    "com.google.dagger:dagger-producers:jar:sources": 118085986,
-    "com.google.dagger:dagger-spi": -1445247775,
-    "com.google.dagger:dagger-spi:jar:sources": 799959681,
-    "com.google.dagger:dagger:jar:sources": 758099566,
-    "com.google.devtools.ksp:symbol-processing-api": -1919668222,
-    "com.google.devtools.ksp:symbol-processing-api:jar:sources": 858565805,
+    "com.google.code.gson:gson": -1575757252,
+    "com.google.code.gson:gson:jar:sources": -350708227,
+    "com.google.dagger:dagger": 2044216803,
+    "com.google.dagger:dagger-compiler": 1178647318,
+    "com.google.dagger:dagger-compiler:jar:sources": 1776580773,
+    "com.google.dagger:dagger-producers": -1027365950,
+    "com.google.dagger:dagger-producers:jar:sources": 755698144,
+    "com.google.dagger:dagger-spi": 1253673566,
+    "com.google.dagger:dagger-spi:jar:sources": 47171893,
+    "com.google.dagger:dagger:jar:sources": -211981169,
+    "com.google.devtools.ksp:symbol-processing-api": -1438360948,
+    "com.google.devtools.ksp:symbol-processing-api:jar:sources": -1678091021,
     "com.google.errorprone:error_prone_annotations": -140447182,
     "com.google.errorprone:error_prone_annotations:jar:sources": 1162312431,
     "com.google.errorprone:javac-shaded": 1621944613,
@@ -69,35 +68,35 @@
     "com.google.guava:listenablefuture": 1079558157,
     "com.google.j2objc:j2objc-annotations": -404209759,
     "com.google.j2objc:j2objc-annotations:jar:sources": 1852793670,
-    "com.google.protobuf:protobuf-java": 1957269082,
-    "com.google.protobuf:protobuf-java-util": -2063472123,
-    "com.google.protobuf:protobuf-java-util:jar:sources": 1148567382,
-    "com.google.protobuf:protobuf-java:jar:sources": 1812626912,
-    "com.google.truth:truth": -905038776,
+    "com.google.protobuf:protobuf-java": 1275644639,
+    "com.google.protobuf:protobuf-java-util": 964781249,
+    "com.google.protobuf:protobuf-java-util:jar:sources": 1094055746,
+    "com.google.protobuf:protobuf-java:jar:sources": 1710724514,
+    "com.google.truth:truth": 2100124227,
     "com.google.truth:truth:jar:sources": 1518815563,
     "com.googlecode.java-diff-utils:diffutils": -799723261,
     "com.googlecode.java-diff-utils:diffutils:jar:sources": -1898874389,
-    "com.squareup.moshi:moshi": 742282205,
-    "com.squareup.moshi:moshi-kotlin": 1555345853,
-    "com.squareup.moshi:moshi-kotlin-codegen": 1314034399,
-    "com.squareup.moshi:moshi-kotlin-codegen:jar:sources": 1601805489,
-    "com.squareup.moshi:moshi-kotlin:jar:sources": -948970528,
-    "com.squareup.moshi:moshi:jar:sources": 121064118,
-    "com.squareup.okio:okio-jvm": -1591357752,
+    "com.squareup.moshi:moshi": -1562904158,
+    "com.squareup.moshi:moshi-kotlin": 294336672,
+    "com.squareup.moshi:moshi-kotlin-codegen": -1394704796,
+    "com.squareup.moshi:moshi-kotlin-codegen:jar:sources": -325577717,
+    "com.squareup.moshi:moshi-kotlin:jar:sources": -246374689,
+    "com.squareup.moshi:moshi:jar:sources": 823659957,
+    "com.squareup.okio:okio-jvm": 290767771,
     "com.squareup.okio:okio-jvm:jar:sources": -528986820,
     "com.squareup:javapoet": -2135371934,
     "com.squareup:javapoet:jar:sources": -54658965,
-    "com.squareup:kotlinpoet": -956847095,
-    "com.squareup:kotlinpoet-jvm": 1558438132,
+    "com.squareup:kotlinpoet": -1287742679,
+    "com.squareup:kotlinpoet-jvm": 1520798478,
     "com.squareup:kotlinpoet-jvm:jar:sources": -1772502751,
-    "com.squareup:kotlinpoet-ksp": 501046869,
+    "com.squareup:kotlinpoet-ksp": -1499126248,
     "com.squareup:kotlinpoet-ksp:jar:sources": -1001181557,
     "com.squareup:kotlinpoet:jar:sources": -826803759,
     "commons-codec:commons-codec": -1161719307,
     "commons-codec:commons-codec:jar:sources": 963281664,
     "commons-io:commons-io": -807333807,
     "commons-io:commons-io:jar:sources": -1339271077,
-    "dev.zacsweers.autoservice:auto-service-ksp": 2067104670,
+    "dev.zacsweers.autoservice:auto-service-ksp": 1063955848,
     "dev.zacsweers.autoservice:auto-service-ksp:jar:sources": 537498971,
     "jakarta.inject:jakarta.inject-api": 188991469,
     "jakarta.inject:jakarta.inject-api:jar:sources": -1584622703,
@@ -121,34 +120,27 @@
     "org.codehaus.plexus:plexus-utils:jar:sources": -1161470753,
     "org.hamcrest:hamcrest-core": 649657847,
     "org.hamcrest:hamcrest-core:jar:sources": -1646511374,
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": 317900594,
-    "org.jetbrains.kotlin:kotlin-metadata-jvm:jar:sources": -1351155643,
-    "org.jetbrains.kotlin:kotlin-reflect": 633705220,
+    "org.jetbrains.kotlin:kotlin-reflect": -1383479841,
     "org.jetbrains.kotlin:kotlin-reflect:jar:sources": 681255358,
-    "org.jetbrains.kotlin:kotlin-stdlib": 7230454,
-    "org.jetbrains.kotlin:kotlin-stdlib-common": -1695006459,
-    "org.jetbrains.kotlin:kotlin-stdlib-common:jar:sources": 1871613908,
-    "org.jetbrains.kotlin:kotlin-stdlib-jdk7": -1550210296,
+    "org.jetbrains.kotlin:kotlin-stdlib": 1228489116,
+    "org.jetbrains.kotlin:kotlin-stdlib-jdk7": 2048950107,
     "org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:sources": -1337794929,
-    "org.jetbrains.kotlin:kotlin-stdlib-jdk8": -1415041167,
+    "org.jetbrains.kotlin:kotlin-stdlib-jdk8": 1379305150,
     "org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:sources": 1198294854,
-    "org.jetbrains.kotlin:kotlin-stdlib:jar:sources": -1886221917,
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core": -916025741,
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core:jar:sources": -1493138165,
+    "org.jetbrains.kotlin:kotlin-stdlib:jar:sources": -151792859,
     "org.jetbrains:annotations": 554168982,
     "org.jetbrains:annotations:jar:sources": 1226441379,
     "org.jspecify:jspecify": 117231129,
     "org.jspecify:jspecify:jar:sources": -2134060298,
-    "org.ow2.asm:asm": 611381606,
-    "org.ow2.asm:asm-commons": 1032323649,
-    "org.ow2.asm:asm-commons:jar:sources": 1132541635,
-    "org.ow2.asm:asm-tree": -1593303232,
-    "org.ow2.asm:asm-tree:jar:sources": -9096772,
-    "org.ow2.asm:asm:jar:sources": 2137835992
+    "org.ow2.asm:asm": -153858314,
+    "org.ow2.asm:asm-commons": -1686699013,
+    "org.ow2.asm:asm-commons:jar:sources": 682798039,
+    "org.ow2.asm:asm-tree": -1259783189,
+    "org.ow2.asm:asm-tree:jar:sources": 25283133,
+    "org.ow2.asm:asm:jar:sources": 1372783843
   },
   "conflict_resolution": {
-    "com.google.errorprone:error_prone_annotations:2.23.0": "com.google.errorprone:error_prone_annotations:2.26.1",
-    "com.google.guava:guava:33.0.0-jre": "com.google.guava:guava:33.2.1-jre"
+    "com.google.guava:guava:27.1-jre": "com.google.guava:guava:33.2.1-jre"
   },
   "artifacts": {
     "com.eed3si9n.jarjar:jarjar": {
@@ -174,17 +166,17 @@
     },
     "com.google.auto.value:auto-value": {
       "shasums": {
-        "jar": "aaf8d637bfed3c420436b9facf1b7a88d12c8785374e4202382783005319c2c3",
-        "sources": "4bff06fe077d68f964bd5e05f020ed78fd7870730441e403a2eb306360c4890a"
+        "jar": "ea78010d82efdb2f919b16faed9e6427f07d2998a15c4f619cdc6a6164ecd336",
+        "sources": "39c581c92f8d48817e5f0a70832fd719aeb2f925aacfb3822b8c6f1ec7a618fe"
       },
-      "version": "1.11.0"
+      "version": "1.10.1"
     },
     "com.google.auto.value:auto-value-annotations": {
       "shasums": {
-        "jar": "5a055ce4255333b3346e1a8703da5bf8ff049532286fdcd31712d624abe111dd",
-        "sources": "d7941e5f19bb38afcfa85350d57e5245856c23c98c2bbe32f6d31b5577f2bc33"
+        "jar": "a4fe0a211925e938a8510d741763ee1171a11bf931f5891ef4d4ee84fca72be2",
+        "sources": "44e6ce2884c18869422765b238f7f173faccd24643fabb5e95597382e80d50a8"
       },
-      "version": "1.11.0"
+      "version": "1.10.1"
     },
     "com.google.auto:auto-common": {
       "shasums": {
@@ -202,45 +194,45 @@
     },
     "com.google.code.gson:gson": {
       "shasums": {
-        "jar": "4241c14a7727c34feea6507ec801318a3d4a90f070e4525681079fb94ee4c593",
-        "sources": "eee1cc5c1f4267ee194cc245777e68084738ef390acd763354ce0ff6bfb7bcc1"
+        "jar": "d3999291855de495c94c743761b8ab5176cfeabe281a5ab0d8e8d45326fd703e",
+        "sources": "ba5bddb1a89eb721fcca39f3b34294532060f851e2407a82d82134a41eec4719"
       },
-      "version": "2.10.1"
+      "version": "2.8.9"
     },
     "com.google.dagger:dagger": {
       "shasums": {
-        "jar": "f0becd6b5e98d56e6ec43f52de3288e1c560847cb81ec170ae44a1c02c0600f0",
-        "sources": "530cbd879dcc23de3ae39d7b9c733c5499914aa77a41fab1c55d97209c283836"
+        "jar": "19680b0f42baa7f9414dacae8663244d323d084a6ee5594ad115a17f3be37c05",
+        "sources": "698d992ae63a8cfa8d4a4af888fcb82d84676a1fef8853e6a0094569c306e971"
       },
-      "version": "2.57.2"
+      "version": "2.53.1"
     },
     "com.google.dagger:dagger-compiler": {
       "shasums": {
-        "jar": "80712a62e4c1ba6a81e193bd29778b059950b6c2d81378b9cdf39b524226f9bc",
-        "sources": "a9ebc73dae5a0312e75bc08c716919f99247359385a5d56aa351c222d822e6a0"
+        "jar": "acd6737e2b2b8fb5a5919e68463b611c6ee5477afd936c791f54b86aa7fd7047",
+        "sources": "cb3c43968bbd2993917db4422493b6df7d43b8069c809941dd86b71170687d57"
       },
-      "version": "2.57.2"
+      "version": "2.53.1"
     },
     "com.google.dagger:dagger-producers": {
       "shasums": {
-        "jar": "85fb9577780f7cfa6b5dc847372efda62670d603ea8c35accc02ad46d0021230",
-        "sources": "596ba4683ac04b4f53daab36904c7ce80855aa4f711b8980e20bb0c8aa26f449"
+        "jar": "8ce7fb23f3f5a479f9c02ed144f3ec83fa9174a9260f19607ac0ec2ab7fb5b29",
+        "sources": "3b5c44d429f29a5207cf7b7b346d347e8fe58bfbf4b520c480508b8fbfe13c51"
       },
-      "version": "2.57.2"
+      "version": "2.53.1"
     },
     "com.google.dagger:dagger-spi": {
       "shasums": {
-        "jar": "ce2779a7c287ee33b1bbd198f5e0de8cc26ba268f607061eafdb068b720494ac",
-        "sources": "e6c3014fd5d0705f4c49f0b96d0263a658497fa1ff8c292e1cb29a0f5e955f54"
+        "jar": "d645593bf5be5185a121e28093f2a2305a92415e70a08e7018898abb258af0fc",
+        "sources": "35ffcf86483d9fc1c6cad91c420ed46340d899cc76eed89844dcf90a35138502"
       },
-      "version": "2.57.2"
+      "version": "2.53.1"
     },
     "com.google.devtools.ksp:symbol-processing-api": {
       "shasums": {
-        "jar": "588d17c4ea982b11028c2c82cb1d7300d269023a8068009f9ae9fb2c9c20c6d9",
-        "sources": "f37f9e6b579ed62aa5741fbd1c862e6b67907a6a49270336838104d43df2505c"
+        "jar": "e38dd8199c65aae4bce9929bf39a563bf7658c600be5066c7e042cdd8de3137c",
+        "sources": "6dbcfd749f6d489d999652801e20e8ee6c4a60c53a0e22bd89947e672f47ff6e"
       },
-      "version": "2.1.21-2.0.2"
+      "version": "2.0.21-1.0.28"
     },
     "com.google.errorprone:error_prone_annotations": {
       "shasums": {
@@ -292,17 +284,17 @@
     },
     "com.google.protobuf:protobuf-java": {
       "shasums": {
-        "jar": "3ca892fd6ea8b37d01bb6917dbc0bf2637548b756753f65a28d4f1d4d982347f",
-        "sources": "ed30fe6a51c7c15a6f123448304c97185f2039f2aeca9d5e3b4f53de3a4c813c"
+        "jar": "fd5cf3d55bc2c3ddb2a8640c9d4c69daa9a5b326fb6e05bae0e56b3f4f85e0f7",
+        "sources": "0674d40c616ee1059deba4740b6239db69beacb60a5e20720553c4e8a105f6d7"
       },
-      "version": "4.33.4"
+      "version": "4.33.1"
     },
     "com.google.protobuf:protobuf-java-util": {
       "shasums": {
-        "jar": "6f02f04c5ca088e74b68dbbaf118f1ffa9d587958e637f893e0f8a1899a61342",
-        "sources": "4bf8ae758fdaae56220796e651cf5fbc3f7ce99bdc42b7048c2604f757592f8a"
+        "jar": "f8788f87658d46f8ddb864455eaa046aa218e419c98c93326643ae465aa5c843",
+        "sources": "e61782c58eec9059f8f386e9da7594e19b477c980111f4bcc78582ad340807ba"
       },
-      "version": "4.33.4"
+      "version": "4.33.1"
     },
     "com.google.truth:truth": {
       "shasums": {
@@ -320,24 +312,24 @@
     },
     "com.squareup.moshi:moshi": {
       "shasums": {
-        "jar": "767f7592c6c61eb693549a26d333c121f5383826bd287b899867aa326dae55e4",
+        "jar": "46a1118fe1fc12723a575c94133fc8936dcc78d3f8873c0e70a055de9e5861a6",
         "sources": "d658332c2b2b57f94d6c26bb747e5dbb65a2d5b47cc3e0a15036977fe832996e"
       },
-      "version": "1.15.2"
+      "version": "1.15.1"
     },
     "com.squareup.moshi:moshi-kotlin": {
       "shasums": {
-        "jar": "5c39cd77e83b111af9c54708173af96a89fd3b09d15019a11da355e83e97d75a",
+        "jar": "3c5a577200fc49a696647a52b1a97598a56d8d6f00e343ffed09d88b4007cdd0",
         "sources": "5b40a79012daa9b3bb0c8f9c61483aa4b01dbec8d7841db66e90e7fead9eb6af"
       },
-      "version": "1.15.2"
+      "version": "1.15.1"
     },
     "com.squareup.moshi:moshi-kotlin-codegen": {
       "shasums": {
-        "jar": "949ce943e0ee135bd41ba4abf08b3a1608d4378671de12388690b5432b4e8a3b",
-        "sources": "999783a0e6f052a3d9a30ca60505ee839bc6e4d8d2c1df3c976ce6784f430f5e"
+        "jar": "14ab79736dc806a245ad76354eb7d53e83bead1d87b092a6b07da6a3287a39ed",
+        "sources": "1a07a0751b0949c52a7a4333587421699537489e05a2e5820876c18855ebf337"
       },
-      "version": "1.15.2"
+      "version": "1.15.1"
     },
     "com.squareup.okio:okio-jvm": {
       "shasums": {
@@ -472,13 +464,6 @@
       },
       "version": "1.3"
     },
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": {
-      "shasums": {
-        "jar": "00590f26a5a768777f04252c6cf93c016a3361a6bc93636df67375ad4d19557d",
-        "sources": "2ededf948f1afd503217a772c95718a41494e757762206216f4c1b42ada64585"
-      },
-      "version": "2.3.21"
-    },
     "org.jetbrains.kotlin:kotlin-reflect": {
       "shasums": {
         "jar": "a65166445bb85ef816cde127279fe0017d2b7cc439b3b972390e1b736d64e94c",
@@ -488,17 +473,10 @@
     },
     "org.jetbrains.kotlin:kotlin-stdlib": {
       "shasums": {
-        "jar": "6f64eac736db9434dd6925b4a518b9d1d17177652320c37916cf9ba3ce7d7d7a",
-        "sources": "8693386ae174f7e4a91eb82c5c632d169d236704da24f78b9c8c84d87af2fd64"
+        "jar": "f31cc53f105a7e48c093683bbd5437561d1233920513774b470805641bedbc09",
+        "sources": "5995c780c3ac742fb277ced561ebd7b0739227ea7c93a6bd9c7cee6593493fce"
       },
-      "version": "2.3.21"
-    },
-    "org.jetbrains.kotlin:kotlin-stdlib-common": {
-      "shasums": {
-        "jar": "8601e004d74d4be5e871f6c43a730b482ce4dff45082b08924d5d69d33c9f7d1",
-        "sources": "61a4a7b3a7664ac64020e3a87627207413ce9f28e5ffb54452c546e69fbab8eb"
-      },
-      "version": "1.4.0"
+      "version": "2.0.21"
     },
     "org.jetbrains.kotlin:kotlin-stdlib-jdk7": {
       "shasums": {
@@ -513,13 +491,6 @@
         "sources": "40e9a80f6b953d12389623760d438e69914098d0c4d7053f70f90533ec041259"
       },
       "version": "1.8.21"
-    },
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core": {
-      "shasums": {
-        "jar": "4cd24a06b2a253110d8afd250e9eec6c6faafea6463d740824743d637e761f12",
-        "sources": "37131e26d85c4d8c7e16b05e524ce00998aee543e6d77b6f0351a475f9f6815e"
-      },
-      "version": "1.4.2"
     },
     "org.jetbrains:annotations": {
       "shasums": {
@@ -537,24 +508,24 @@
     },
     "org.ow2.asm:asm": {
       "shasums": {
-        "jar": "876eab6a83daecad5ca67eb9fcabb063c97b5aeb8cf1fca7a989ecde17522051",
-        "sources": "c6294794f956f21e2b252a9bf65a96ce0489fb4c0f978447d85c8a75e485b633"
+        "jar": "ed825d10ab1399c8c0cb669e688cf0c8c82629b4c8399b58352b68e92ca10fcb",
+        "sources": "cb29bf42b4008972c566944d377192aa1b2d90275b9cfa9a7fa86de669fde11c"
       },
-      "version": "9.8"
+      "version": "9.10.1"
     },
     "org.ow2.asm:asm-commons": {
       "shasums": {
-        "jar": "3301a1c1cb4c59fcc5292648dac1d7c5aed4c0f067dfbe88873b8cdfe77404f4",
-        "sources": "a2bd3ba563c5f2e19eea66df99437ef81d69a0dcb3def07028442a273a2da562"
+        "jar": "6d0abefb7cbf972ea16edb37ec14835372505063a45f976ab7ea889ed9497895",
+        "sources": "a26e55103e094a0f6df75a7b5e578bd7b4ad73abd2641b0fa2ac97db70641906"
       },
-      "version": "9.8"
+      "version": "9.10.1"
     },
     "org.ow2.asm:asm-tree": {
       "shasums": {
-        "jar": "14b7880cb7c85eed101e2710432fc3ffb83275532a6a894dc4c4095d49ad59f1",
-        "sources": "442d32be6106a41b61c2edf05f8ae496c4c54cca6e73d9d59d38e9cb54820c44"
+        "jar": "3dfb0d5b6a106cd40b5b250e39935fbf2f927f4477546a5369a3ac609cf0506b",
+        "sources": "93a9406bb68abff43f491891625e0d3c7edce87b70d2370ec1ea4627c9ead090"
       },
-      "version": "9.8"
+      "version": "9.10.1"
     }
   },
   "dependencies": {
@@ -589,7 +560,6 @@
       "javax.inject:javax.inject",
       "net.ltgt.gradle.incap:incap",
       "org.checkerframework:checker-compat-qual",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm",
       "org.jetbrains.kotlin:kotlin-stdlib"
     ],
     "com.google.dagger:dagger-producers": [
@@ -685,9 +655,6 @@
       "commons-io:commons-io",
       "org.apache.commons:commons-lang3"
     ],
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": [
-      "org.jetbrains.kotlin:kotlin-stdlib"
-    ],
     "org.jetbrains.kotlin:kotlin-reflect": [
       "org.jetbrains.kotlin:kotlin-stdlib"
     ],
@@ -700,10 +667,6 @@
     "org.jetbrains.kotlin:kotlin-stdlib-jdk8": [
       "org.jetbrains.kotlin:kotlin-stdlib",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
-    ],
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core": [
-      "org.jetbrains.kotlin:kotlin-stdlib",
-      "org.jetbrains.kotlin:kotlin-stdlib-common"
     ],
     "org.ow2.asm:asm-commons": [
       "org.ow2.asm:asm",
@@ -749,9 +712,42 @@
       "autovalue.shaded.com.google.escapevelocity",
       "autovalue.shaded.com.google.j2objc.annotations",
       "autovalue.shaded.com.squareup.javapoet",
+      "autovalue.shaded.kotlin",
+      "autovalue.shaded.kotlin.annotation",
+      "autovalue.shaded.kotlin.collections",
+      "autovalue.shaded.kotlin.collections.builders",
+      "autovalue.shaded.kotlin.collections.unsigned",
+      "autovalue.shaded.kotlin.comparisons",
+      "autovalue.shaded.kotlin.coroutines",
+      "autovalue.shaded.kotlin.coroutines.intrinsics",
+      "autovalue.shaded.kotlin.coroutines.jvm.internal",
+      "autovalue.shaded.kotlin.experimental",
+      "autovalue.shaded.kotlin.internal",
+      "autovalue.shaded.kotlin.jvm",
+      "autovalue.shaded.kotlin.jvm.functions",
+      "autovalue.shaded.kotlin.jvm.internal",
+      "autovalue.shaded.kotlin.jvm.internal.markers",
+      "autovalue.shaded.kotlin.random",
+      "autovalue.shaded.kotlin.ranges",
+      "autovalue.shaded.kotlin.reflect",
+      "autovalue.shaded.kotlin.sequences",
+      "autovalue.shaded.kotlin.text",
+      "autovalue.shaded.kotlinx.metadata",
+      "autovalue.shaded.kotlinx.metadata.impl",
+      "autovalue.shaded.kotlinx.metadata.impl.extensions",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata.deserialization",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata.jvm",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata.jvm.deserialization",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata.jvm.serialization",
+      "autovalue.shaded.kotlinx.metadata.internal.metadata.serialization",
+      "autovalue.shaded.kotlinx.metadata.internal.protobuf",
+      "autovalue.shaded.kotlinx.metadata.jvm",
+      "autovalue.shaded.kotlinx.metadata.jvm.impl",
       "autovalue.shaded.net.ltgt.gradle.incap",
       "autovalue.shaded.org.checkerframework.checker.nullness.qual",
       "autovalue.shaded.org.checkerframework.framework.qual",
+      "autovalue.shaded.org.jetbrains.annotations",
       "autovalue.shaded.org.objectweb.asm",
       "com.google.auto.value.extension",
       "com.google.auto.value.extension.memoized.processor",
@@ -801,24 +797,14 @@
       "dagger.internal.codegen.bindinggraphvalidation",
       "dagger.internal.codegen.compileroption",
       "dagger.internal.codegen.componentgenerator",
+      "dagger.internal.codegen.javapoet",
       "dagger.internal.codegen.kotlin",
+      "dagger.internal.codegen.langmodel",
       "dagger.internal.codegen.model",
       "dagger.internal.codegen.processingstep",
       "dagger.internal.codegen.validation",
       "dagger.internal.codegen.writing",
-      "dagger.internal.codegen.xprocessing",
-      "dagger.spi.internal.shaded.androidx.room.compiler.codegen",
-      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.compat",
-      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.impl",
-      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.java",
-      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.kotlin",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.compat",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.javac",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.kotlin",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.ksp",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.ksp.synthetic",
-      "dagger.spi.internal.shaded.androidx.room.compiler.processing.util"
+      "dagger.internal.codegen.xprocessing"
     ],
     "com.google.dagger:dagger-producers": [
       "dagger.producers",
@@ -830,8 +816,47 @@
       "dagger.internal.codegen.extension",
       "dagger.model",
       "dagger.spi",
-      "dagger.spi.internal.shaded.com.google.auto.common",
-      "dagger.spi.internal.shaded.com.squareup.kotlinpoet.javapoet",
+      "dagger.spi.internal.shaded.androidx.room.compiler.codegen",
+      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.compat",
+      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.impl",
+      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.java",
+      "dagger.spi.internal.shaded.androidx.room.compiler.codegen.kotlin",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.compat",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.javac",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.javac.kotlin",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.ksp",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.ksp.synthetic",
+      "dagger.spi.internal.shaded.androidx.room.compiler.processing.util",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.common",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.extensions",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.builtins",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.deserialization",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.jvm",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.jvm.deserialization",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.jvm.serialization",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.metadata.serialization",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.protobuf",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.jvm",
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.jvm.internal",
+      "dagger.spi.internal.shaded.auto.common",
+      "dagger.spi.internal.shaded.kotlin.metadata",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.common",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.extensions",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.builtins",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.deserialization",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.jvm",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.jvm.deserialization",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.jvm.serialization",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.metadata.serialization",
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.protobuf",
+      "dagger.spi.internal.shaded.kotlin.metadata.jvm",
+      "dagger.spi.internal.shaded.kotlin.metadata.jvm.internal",
       "dagger.spi.model"
     ],
     "com.google.devtools.ksp:symbol-processing-api": [
@@ -1164,22 +1189,6 @@
       "org.hamcrest.core",
       "org.hamcrest.internal"
     ],
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": [
-      "kotlin.metadata",
-      "kotlin.metadata.internal",
-      "kotlin.metadata.internal.common",
-      "kotlin.metadata.internal.extensions",
-      "kotlin.metadata.internal.metadata",
-      "kotlin.metadata.internal.metadata.builtins",
-      "kotlin.metadata.internal.metadata.deserialization",
-      "kotlin.metadata.internal.metadata.jvm",
-      "kotlin.metadata.internal.metadata.jvm.deserialization",
-      "kotlin.metadata.internal.metadata.jvm.serialization",
-      "kotlin.metadata.internal.metadata.serialization",
-      "kotlin.metadata.internal.protobuf",
-      "kotlin.metadata.jvm",
-      "kotlin.metadata.jvm.internal"
-    ],
     "org.jetbrains.kotlin:kotlin-reflect": [
       "kotlin.reflect.full",
       "kotlin.reflect.jvm",
@@ -1254,8 +1263,6 @@
       "kotlin.collections.unsigned",
       "kotlin.comparisons",
       "kotlin.concurrent",
-      "kotlin.concurrent.atomics",
-      "kotlin.concurrent.internal",
       "kotlin.contracts",
       "kotlin.coroutines",
       "kotlin.coroutines.cancellation",
@@ -1292,20 +1299,6 @@
       "kotlin.time",
       "kotlin.time.jdk8",
       "kotlin.uuid"
-    ],
-    "org.jetbrains.kotlinx:kotlinx-coroutines-core": [
-      "kotlinx.coroutines",
-      "kotlinx.coroutines.channels",
-      "kotlinx.coroutines.debug",
-      "kotlinx.coroutines.debug.internal",
-      "kotlinx.coroutines.flow",
-      "kotlinx.coroutines.flow.internal",
-      "kotlinx.coroutines.internal",
-      "kotlinx.coroutines.intrinsics",
-      "kotlinx.coroutines.scheduling",
-      "kotlinx.coroutines.selects",
-      "kotlinx.coroutines.sync",
-      "kotlinx.coroutines.test"
     ],
     "org.jetbrains:annotations": [
       "org.intellij.lang.annotations",
@@ -1418,20 +1411,14 @@
       "org.codehaus.plexus:plexus-utils:jar:sources",
       "org.hamcrest:hamcrest-core",
       "org.hamcrest:hamcrest-core:jar:sources",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm:jar:sources",
       "org.jetbrains.kotlin:kotlin-reflect",
       "org.jetbrains.kotlin:kotlin-reflect:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib",
-      "org.jetbrains.kotlin:kotlin-stdlib-common",
-      "org.jetbrains.kotlin:kotlin-stdlib-common:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib:jar:sources",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core:jar:sources",
       "org.jetbrains:annotations",
       "org.jetbrains:annotations:jar:sources",
       "org.jspecify:jspecify",
@@ -1535,20 +1522,14 @@
       "org.codehaus.plexus:plexus-utils:jar:sources",
       "org.hamcrest:hamcrest-core",
       "org.hamcrest:hamcrest-core:jar:sources",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm:jar:sources",
       "org.jetbrains.kotlin:kotlin-reflect",
       "org.jetbrains.kotlin:kotlin-reflect:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib",
-      "org.jetbrains.kotlin:kotlin-stdlib-common",
-      "org.jetbrains.kotlin:kotlin-stdlib-common:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib:jar:sources",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core:jar:sources",
       "org.jetbrains:annotations",
       "org.jetbrains:annotations:jar:sources",
       "org.jspecify:jspecify",
@@ -1652,20 +1633,14 @@
       "org.codehaus.plexus:plexus-utils:jar:sources",
       "org.hamcrest:hamcrest-core",
       "org.hamcrest:hamcrest-core:jar:sources",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm",
-      "org.jetbrains.kotlin:kotlin-metadata-jvm:jar:sources",
       "org.jetbrains.kotlin:kotlin-reflect",
       "org.jetbrains.kotlin:kotlin-reflect:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib",
-      "org.jetbrains.kotlin:kotlin-stdlib-common",
-      "org.jetbrains.kotlin:kotlin-stdlib-common:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk7:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
       "org.jetbrains.kotlin:kotlin-stdlib-jdk8:jar:sources",
       "org.jetbrains.kotlin:kotlin-stdlib:jar:sources",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core",
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core:jar:sources",
       "org.jetbrains:annotations",
       "org.jetbrains:annotations:jar:sources",
       "org.jspecify:jspecify",
@@ -1690,6 +1665,9 @@
       ]
     },
     "com.google.auto.value:auto-value": {
+      "autovalue.shaded.kotlinx.metadata.impl.extensions.MetadataExtensions": [
+        "autovalue.shaded.kotlinx.metadata.jvm.impl.JvmMetadataExtensions"
+      ],
       "com.google.auto.value.extension.AutoValueExtension": [
         "com.google.auto.value.extension.memoized.processor.MemoizeExtension",
         "com.google.auto.value.extension.serializable.processor.SerializableAutoValueExtension",
@@ -1718,6 +1696,14 @@
         "dagger.internal.codegen.ComponentProcessor"
       ]
     },
+    "com.google.dagger:dagger-spi": {
+      "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.internal.extensions.MetadataExtensions": [
+        "dagger.spi.internal.shaded.androidx.room.jarjarred.kotlin.metadata.jvm.internal.JvmMetadataExtensions"
+      ],
+      "dagger.spi.internal.shaded.kotlin.metadata.internal.extensions.MetadataExtensions": [
+        "dagger.spi.internal.shaded.kotlin.metadata.jvm.internal.JvmMetadataExtensions"
+      ]
+    },
     "com.squareup.moshi:moshi-kotlin-codegen": {
       "com.google.devtools.ksp.processing.SymbolProcessorProvider": [
         "com.squareup.moshi.kotlin.codegen.ksp.JsonClassSymbolProcessorProvider"
@@ -1732,16 +1718,6 @@
     "dev.zacsweers.autoservice:auto-service-ksp": {
       "com.google.devtools.ksp.processing.SymbolProcessorProvider": [
         "dev.zacsweers.autoservice.ksp.AutoServiceSymbolProcessor$Provider"
-      ]
-    },
-    "org.jetbrains.kotlin:kotlin-metadata-jvm": {
-      "kotlin.metadata.internal.extensions.MetadataExtensions": [
-        "kotlin.metadata.jvm.internal.JvmMetadataExtensions"
-      ]
-    },
-    "org.jetbrains.kotlin:kotlin-metadata-jvm:jar:sources": {
-      "kotlin.metadata.internal.extensions.MetadataExtensions": [
-        "kotlin.metadata.jvm.internal.JvmMetadataExtensions"
       ]
     },
     "org.jetbrains.kotlin:kotlin-reflect": {
