@@ -26,11 +26,10 @@ load(
 )
 load(
     "//kotlin/internal/jvm:kover.bzl",
-    _create_kover_agent_actions = "create_kover_agent_actions",
     _create_kover_metadata_action = "create_kover_metadata_action",
     _get_kover_agent_files = "get_kover_agent_file",
-    _get_kover_jvm_flags = "get_kover_jvm_flags",
     _is_kover_enabled = "is_kover_enabled",
+    _kover_jvm_flags_setup = "kover_jvm_flags_setup",
 )
 load(
     "//kotlin/internal/utils:utils.bzl",
@@ -124,6 +123,7 @@ def _write_launcher_action(ctx, rjars, main_class, jvm_flags):
                 "%set_java_coverage_new_implementation%": """export JAVA_COVERAGE_NEW_IMPLEMENTATION=YES""",
                 "%test_runtime_classpath_file%": "export TEST_RUNTIME_CLASSPATH_FILE=${JAVA_RUNFILES}",
                 "%workspace_prefix%": ctx.workspace_name + "/",
+                "%kover_jvm_flags_setup%": "",
             },
             is_executable = True,
         )
@@ -132,6 +132,30 @@ def _write_launcher_action(ctx, rjars, main_class, jvm_flags):
     classpath = ctx.configuration.host_path_separator.join(
         ["${RUNPATH}%s" % (j.short_path) for j in rjars.to_list()],
     )
+
+    if ctx.configuration.coverage_enabled and _is_kover_enabled(ctx):
+        kover_agent_files = _get_kover_agent_files(ctx)
+        ctx.actions.expand_template(
+            template = template,
+            output = ctx.outputs.executable,
+            substitutions = {
+                "%classpath%": classpath,
+                "%java_start_class%": main_class,
+                "%javabin%": java_bin,
+                "%jvm_flags%": jvm_flags,
+                "%needs_runfiles%": "0" if _is_absolute(java_bin_path) else "1",
+                "%runfiles_manifest_only%": "",
+                "%set_jacoco_java_runfiles_root%": "",
+                "%set_jacoco_main_class%": "",
+                "%set_jacoco_metadata%": "",
+                "%set_java_coverage_new_implementation%": """export JAVA_COVERAGE_NEW_IMPLEMENTATION=NO""",
+                "%test_runtime_classpath_file%": "export TEST_RUNTIME_CLASSPATH_FILE=${JAVA_RUNFILES}",
+                "%workspace_prefix%": ctx.workspace_name + "/",
+                "%kover_jvm_flags_setup%": _kover_jvm_flags_setup(kover_agent_files, ctx.label.package, ctx.attr.name),
+            },
+            is_executable = True,
+        )
+        return []
 
     ctx.actions.expand_template(
         template = template,
@@ -149,6 +173,7 @@ def _write_launcher_action(ctx, rjars, main_class, jvm_flags):
             "%set_java_coverage_new_implementation%": """export JAVA_COVERAGE_NEW_IMPLEMENTATION=NO""",
             "%test_runtime_classpath_file%": "export TEST_RUNTIME_CLASSPATH_FILE=${JAVA_RUNFILES}",
             "%workspace_prefix%": ctx.workspace_name + "/",
+            "%kover_jvm_flags_setup%": "",
         },
         is_executable = True,
     )
@@ -299,19 +324,13 @@ def kt_jvm_junit_test_impl(ctx):
     if ctx.configuration.coverage_enabled:
         if _is_kover_enabled(ctx):
             kover_agent_files = _get_kover_agent_files(ctx)
-            kover_output_file, kover_args_file = _create_kover_agent_actions(ctx, ctx.attr.name)
             kover_output_metadata_file = _create_kover_metadata_action(
                 ctx,
                 ctx.attr.name,
                 ctx.attr.deps + ctx.attr.associates,
-                kover_output_file,
             )
-            flags = _get_kover_jvm_flags(kover_agent_files, kover_args_file)
-
-            # add Kover agent jvm_flag, inputs and outputs
-            coverage_jvm_flags = [flags]
             coverage_inputs = [depset(kover_agent_files)]
-            coverage_runfiles = [kover_args_file, kover_output_metadata_file]
+            coverage_runfiles = [kover_output_metadata_file]
         else:
             jacocorunner = ctx.toolchains[_TOOLCHAIN_TYPE].jacocorunner
             coverage_runfiles = jacocorunner.files.to_list()

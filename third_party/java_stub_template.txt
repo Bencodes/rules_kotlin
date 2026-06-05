@@ -292,6 +292,17 @@ if [[ -n "$TEST_TMPDIR" && -d "$TEST_TMPDIR" ]]; then
   JVM_FLAGS+=" -Djava.io.tmpdir=$TEST_TMPDIR"
 fi
 
+function _setup_kover() {
+  local agent="$1" pkg="$2" name="$3"
+  local ic
+  ic=$(mktemp)
+  mkdir -p "${TEST_UNDECLARED_OUTPUTS_DIR}/${pkg}"
+  echo "report.file=${TEST_UNDECLARED_OUTPUTS_DIR}/${pkg}/${name}-kover_report.ic" > "$ic"
+  JVM_FLAGS="${JVM_FLAGS} -Xbootclasspath/a:${agent} -javaagent:${agent}=file:${ic}"
+}
+
+%kover_jvm_flags_setup%
+
 ARGS=(
   ${JVM_DEBUG_FLAGS}
   ${JVM_FLAGS}
