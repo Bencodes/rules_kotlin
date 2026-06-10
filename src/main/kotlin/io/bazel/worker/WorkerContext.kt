@@ -109,11 +109,18 @@ class WorkerContext private constructor(
   class TaskContext internal constructor(
     val directory: Path,
     logging: ScopeLogging,
+    /**
+     * The multiplex sandbox directory for this request (WorkRequest.sandbox_dir), or null when the
+     * task is not running in a multiplex sandbox. When set, the worker must resolve every input and
+     * output file path relative to this directory, since the paths passed in the request do not
+     * include the sandbox prefix. See the worker_protocol.proto docs for `sandbox_dir`.
+     */
+    val sandboxDir: Path? = null,
   ) : ScopeLogging by logging {
     fun <T> subTask(
       name: String = javaClass.canonicalName,
       task: (sub: TaskContext) -> T,
-    ): T = task(TaskContext(directory, logging = narrowTo(name)))
+    ): T = task(TaskContext(directory, logging = narrowTo(name), sandboxDir = sandboxDir))
 
     /** resultOf a status supplier that includes information collected in the Context. */
     fun resultOf(executeTaskIn: (TaskContext) -> Status): TaskResult {
@@ -148,7 +155,7 @@ class WorkerContext private constructor(
   ): TaskResult {
     info { "start task $name" }
     return if (sandboxDir != null) {
-      TaskContext(sandboxDir, logging = narrowTo(name)).resultOf(task)
+      TaskContext(sandboxDir, logging = narrowTo(name), sandboxDir = sandboxDir).resultOf(task)
     } else {
       WorkingDirectoryContext
         .use {

@@ -48,6 +48,26 @@ class KotlinBuilder
       @JvmStatic
       private val FLAGFILE_RE = Pattern.compile("""^--flagfile=((.*)-(\d+).params)$""").toRegex()
 
+      /**
+       * Resolves a request-relative input/output path against the multiplex sandbox directory.
+       *
+       * Under path mapping with multiplex sandboxing, Bazel strips the configuration prefix from
+       * paths (e.g. `bazel-out/cfg/bin/...`) and materializes the actual files inside the request's
+       * `sandbox_dir`; the worker is responsible for prefixing them (see worker_protocol.proto).
+       * When [sandboxDir] is null (no sandbox) or the path is empty/already absolute, the path is
+       * returned unchanged.
+       */
+      @JvmStatic
+      internal fun resolveInSandbox(
+        sandboxDir: Path?,
+        path: String,
+      ): String =
+        if (sandboxDir != null && path.isNotEmpty() && !Path.of(path).isAbsolute) {
+          sandboxDir.resolve(path).toString()
+        } else {
+          path
+        }
+
       enum class KotlinBuilderFlags(
         override val flag: String,
       ) : Flag {
@@ -108,7 +128,7 @@ class KotlinBuilder
         when (compileContext.info.platform) {
           Platform.JVM,
           Platform.ANDROID,
-          -> executeJvmTask(compileContext, taskContext.directory, argMap)
+          -> executeJvmTask(compileContext, taskContext.directory, argMap, taskContext.sandboxDir)
           Platform.UNRECOGNIZED -> throw IllegalStateException(
             "unrecognized platform: ${compileContext.info}",
           )
@@ -133,17 +153,23 @@ class KotlinBuilder
       check(args.isNotEmpty()) { "expected at least a single arg got: ${args.joinToString(" ")}" }
       val lines =
         FLAGFILE_RE.matchEntire(args[0])?.groups?.get(1)?.let {
-          Files.readAllLines(FileSystems.getDefault().getPath(it.value), StandardCharsets.UTF_8)
+          Files.readAllLines(
+            FileSystems.getDefault().getPath(resolveInSandbox(ctx.sandboxDir, it.value)),
+            StandardCharsets.UTF_8,
+          )
         } ?: args
 
       val argMap = ArgMaps.from(lines)
-      val info = buildTaskInfo(argMap).build()
+      val info = buildTaskInfo(argMap, ctx.sandboxDir).build()
       val context =
         CompilationTaskContext(info, ctx.asPrintStream())
       return Pair(argMap, context)
     }
 
-    private fun buildTaskInfo(argMap: ArgMap): CompilationTaskInfo.Builder =
+    private fun buildTaskInfo(
+      argMap: ArgMap,
+      sandboxDir: Path?,
+    ): CompilationTaskInfo.Builder =
       with(CompilationTaskInfo.newBuilder()) {
         addAllDebug(argMap.mandatory(KotlinBuilderFlags.DEBUG))
 
@@ -161,7 +187,10 @@ class KotlinBuilder
         addAllPassthroughFlags(argMap.optional(KotlinBuilderFlags.PASSTHROUGH_FLAGS) ?: emptyList())
         addAllKspOpts(argMap.optional(KotlinBuilderFlags.KSP_OPTS) ?: emptyList())
 
-        argMap.optional(KotlinBuilderFlags.FRIEND_PATHS)?.let(::addAllFriendPaths)
+        argMap
+          .optional(KotlinBuilderFlags.FRIEND_PATHS)
+          ?.map { resolveInSandbox(sandboxDir, it) }
+          ?.let(::addAllFriendPaths)
         toolchainInfoBuilder.commonBuilder.apiVersion =
           argMap.mandatorySingle(KotlinBuilderFlags.API_VERSION)
         toolchainInfoBuilder.commonBuilder.languageVersion =
@@ -193,8 +222,9 @@ class KotlinBuilder
       context: CompilationTaskContext,
       workingDir: Path,
       argMap: ArgMap,
+      sandboxDir: Path?,
     ) {
-      val task = buildJvmTask(context.info, workingDir, argMap)
+      val task = buildJvmTask(context.info, workingDir, argMap, sandboxDir)
       context.whenTracing {
         printProto("jvm task message:", task)
       }
@@ -205,6 +235,7 @@ class KotlinBuilder
       info: CompilationTaskInfo,
       workingDir: Path,
       argMap: ArgMap,
+      sandboxDir: Path?,
     ): JvmCompilationTask =
       JvmCompilationTask.newBuilder().let { root ->
         root.info = info
@@ -216,26 +247,32 @@ class KotlinBuilder
               KotlinBuilderFlags.INSTRUMENT_COVERAGE,
             ).toBoolean()
 
+        // Output files are declared with stripped (config-relative) paths under path mapping; when
+        // running in a multiplex sandbox they must be written relative to the sandbox directory.
         with(root.outputsBuilder) {
-          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT)?.let { jar = it }
-          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT_SRCJAR)?.let { srcjar = it }
+          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT)?.let { jar = resolveInSandbox(sandboxDir, it) }
+          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT_SRCJAR)?.let {
+            srcjar = resolveInSandbox(sandboxDir, it)
+          }
 
-          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT_JDEPS)?.apply { jdeps = this }
-          argMap.optionalSingle(KotlinBuilderFlags.GENERATED_JAVA_SRC_JAR)?.apply {
-            generatedJavaSrcJar = this
+          argMap.optionalSingle(KotlinBuilderFlags.OUTPUT_JDEPS)?.let {
+            jdeps = resolveInSandbox(sandboxDir, it)
           }
-          argMap.optionalSingle(KotlinBuilderFlags.GENERATED_JAVA_STUB_JAR)?.apply {
-            generatedJavaStubJar = this
+          argMap.optionalSingle(KotlinBuilderFlags.GENERATED_JAVA_SRC_JAR)?.let {
+            generatedJavaSrcJar = resolveInSandbox(sandboxDir, it)
           }
-          argMap.optionalSingle(KotlinBuilderFlags.ABI_JAR)?.let { abijar = it }
+          argMap.optionalSingle(KotlinBuilderFlags.GENERATED_JAVA_STUB_JAR)?.let {
+            generatedJavaStubJar = resolveInSandbox(sandboxDir, it)
+          }
+          argMap.optionalSingle(KotlinBuilderFlags.ABI_JAR)?.let { abijar = resolveInSandbox(sandboxDir, it) }
           argMap.optionalSingle(KotlinBuilderFlags.GENERATED_CLASS_JAR)?.let {
-            generatedClassJar = it
+            generatedClassJar = resolveInSandbox(sandboxDir, it)
           }
           argMap.optionalSingle(KotlinBuilderFlags.KSP_GENERATED_JAVA_SRCJAR)?.let {
-            generatedKspSrcJar = it
+            generatedKspSrcJar = resolveInSandbox(sandboxDir, it)
           }
           argMap.optionalSingle(KotlinBuilderFlags.KSP_GENERATED_CLASSES_JAR)?.let {
-            generatedKspClassesJar = it
+            generatedKspClassesJar = resolveInSandbox(sandboxDir, it)
           }
         }
 
@@ -280,32 +317,50 @@ class KotlinBuilder
               .toString()
         }
 
+        // Input files are passed with stripped (config-relative) paths under path mapping; when
+        // running in a multiplex sandbox the actual files live under the sandbox directory, so the
+        // worker must prefix them before handing them to the compiler. `processors` (class names)
+        // are not paths and are left untouched. Plugin option strings (stubs/compiler plugin
+        // options, ksp_opts) may embed paths but are not remapped here.
         with(root.inputsBuilder) {
-          addAllClasspath(argMap.mandatory(KotlinBuilderFlags.CLASSPATH))
+          addAllClasspath(argMap.mandatory(KotlinBuilderFlags.CLASSPATH).map { resolveInSandbox(sandboxDir, it) })
           addAllDepsArtifacts(
-            argMap.optional(KotlinBuilderFlags.DEPS_ARTIFACTS) ?: emptyList(),
+            (argMap.optional(KotlinBuilderFlags.DEPS_ARTIFACTS) ?: emptyList()).map {
+              resolveInSandbox(sandboxDir, it)
+            },
           )
-          addAllDirectDependencies(argMap.mandatory(KotlinBuilderFlags.DIRECT_DEPENDENCIES))
+          addAllDirectDependencies(
+            argMap.mandatory(KotlinBuilderFlags.DIRECT_DEPENDENCIES).map { resolveInSandbox(sandboxDir, it) },
+          )
 
           addAllProcessors(argMap.optional(KotlinBuilderFlags.PROCESSORS) ?: emptyList())
-          addAllProcessorpaths(argMap.optional(KotlinBuilderFlags.PROCESSOR_PATH) ?: emptyList())
+          addAllProcessorpaths(
+            (argMap.optional(KotlinBuilderFlags.PROCESSOR_PATH) ?: emptyList()).map {
+              resolveInSandbox(sandboxDir, it)
+            },
+          )
 
           addAllStubsPluginOptions(
             argMap.optional(KotlinBuilderFlags.STUBS_PLUGIN_OPTIONS) ?: emptyList(),
           )
           addAllStubsPluginClasspath(
-            argMap.optional(KotlinBuilderFlags.STUBS_PLUGIN_CLASS_PATH) ?: emptyList(),
+            (argMap.optional(KotlinBuilderFlags.STUBS_PLUGIN_CLASS_PATH) ?: emptyList()).map {
+              resolveInSandbox(sandboxDir, it)
+            },
           )
 
           addAllCompilerPluginOptions(
             argMap.optional(KotlinBuilderFlags.COMPILER_PLUGIN_OPTIONS) ?: emptyList(),
           )
           addAllCompilerPluginClasspath(
-            argMap.optional(KotlinBuilderFlags.COMPILER_PLUGIN_CLASS_PATH) ?: emptyList(),
+            (argMap.optional(KotlinBuilderFlags.COMPILER_PLUGIN_CLASS_PATH) ?: emptyList()).map {
+              resolveInSandbox(sandboxDir, it)
+            },
           )
 
           argMap
             .optional(KotlinBuilderFlags.SOURCES)
+            ?.map { resolveInSandbox(sandboxDir, it) }
             ?.iterator()
             ?.partitionJvmSources(
               { addKotlinSources(it) },
@@ -313,6 +368,7 @@ class KotlinBuilder
             )
           argMap
             .optional(KotlinBuilderFlags.SOURCE_JARS)
+            ?.map { resolveInSandbox(sandboxDir, it) }
             ?.also {
               addAllSourceJars(it)
             }

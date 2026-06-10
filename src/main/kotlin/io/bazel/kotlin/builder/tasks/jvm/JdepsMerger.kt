@@ -29,6 +29,22 @@ class JdepsMerger {
     private val FLAGFILE_RE = Regex("""^--flagfile=((.*)-(\d+).params)$""")
 
     /**
+     * Resolves a request-relative input/output path against the multiplex sandbox directory. See
+     * the worker_protocol.proto docs for `sandbox_dir`. Returns the path unchanged when there is no
+     * sandbox or the path is empty/already absolute.
+     */
+    @JvmStatic
+    private fun resolveInSandbox(
+      sandboxDir: Path?,
+      path: String,
+    ): String =
+      if (sandboxDir != null && path.isNotEmpty() && !Path.of(path).isAbsolute) {
+        sandboxDir.resolve(path).toString()
+      } else {
+        path
+      }
+
+    /**
      * Declares the flags used by the java builder.
      */
     enum class JdepsMergerFlags(
@@ -143,11 +159,17 @@ class JdepsMerger {
     val aspect: String? = null,
   )
 
-  private fun getArgs(args: List<String>): ArgMap {
+  private fun getArgs(
+    args: List<String>,
+    sandboxDir: Path?,
+  ): ArgMap {
     check(args.isNotEmpty()) { "expected at least a single arg got: ${args.joinToString(" ")}" }
     val lines =
       FLAGFILE_RE.matchEntire(args[0])?.groups?.get(1)?.let {
-        Files.readAllLines(FileSystems.getDefault().getPath(it.value), StandardCharsets.UTF_8)
+        Files.readAllLines(
+          FileSystems.getDefault().getPath(resolveInSandbox(sandboxDir, it.value)),
+          StandardCharsets.UTF_8,
+        )
       } ?: args
 
     return ArgMaps.from(lines)
@@ -157,9 +179,11 @@ class JdepsMerger {
     ctx: WorkerContext.TaskContext,
     args: List<String>,
   ): Int {
-    val argMap = getArgs(args)
-    val inputs = argMap.mandatory(JdepsMergerFlags.INPUTS)
-    val output = argMap.mandatorySingle(JdepsMergerFlags.OUTPUT)
+    val argMap = getArgs(args, ctx.sandboxDir)
+    // Inputs (jdeps files) and the merged output are passed with stripped paths under path mapping
+    // and live under the sandbox directory when running multiplex-sandboxed.
+    val inputs = argMap.mandatory(JdepsMergerFlags.INPUTS).map { resolveInSandbox(ctx.sandboxDir, it) }
+    val output = resolveInSandbox(ctx.sandboxDir, argMap.mandatorySingle(JdepsMergerFlags.OUTPUT))
     val label = argMap.mandatorySingle(JdepsMergerFlags.TARGET_LABEL)
     val reportUnusedDeps = argMap.mandatorySingle(JdepsMergerFlags.REPORT_UNUSED_DEPS)
 
