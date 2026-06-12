@@ -15,45 +15,41 @@
 """Tests for Kover code coverage integration."""
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//kotlin/internal/jvm:kover.bzl", "get_kover_jvm_flags")
+load("//kotlin/internal/jvm:kover.bzl", "kover_jvm_flags_setup")
 
-def _get_kover_jvm_flags_test_impl(ctx):
-    """Test that get_kover_jvm_flags generates correct JVM agent flags including bootclasspath."""
+def _kover_jvm_flags_setup_test_impl(ctx):
+    """Test that kover_jvm_flags_setup emits the _setup_kover shell call with agent path, package and name."""
     env = unittest.begin(ctx)
 
-    # Create mock file objects with short_path attribute
+    # Create a mock agent file object with a short_path attribute.
     mock_agent_file = struct(short_path = "external/kover/kover-jvm-agent.jar")
-    mock_args_file = struct(short_path = "bazel-out/k8-fastbuild/bin/test-kover.args.txt")
 
-    result = get_kover_jvm_flags([mock_agent_file], mock_args_file)
+    result = kover_jvm_flags_setup([mock_agent_file], "path/to/pkg", "my_test")
 
-    # Expected format includes both -Xbootclasspath/a and -javaagent flags
-    expected = "-Xbootclasspath/a:external/kover/kover-jvm-agent.jar -javaagent:external/kover/kover-jvm-agent.jar=file:bazel-out/k8-fastbuild/bin/test-kover.args.txt"
+    expected = '_setup_kover "external/kover/kover-jvm-agent.jar" "path/to/pkg" "my_test"'
     asserts.equals(env, expected, result)
 
     return unittest.end(env)
 
-get_kover_jvm_flags_test = unittest.make(_get_kover_jvm_flags_test_impl)
+_kover_jvm_flags_setup_test = unittest.make(_kover_jvm_flags_setup_test_impl)
 
-def _kover_jvm_flags_format_test_impl(ctx):
-    """Test JVM flags format with different path patterns."""
+def _kover_jvm_flags_setup_format_test_impl(ctx):
+    """Test the kover_jvm_flags_setup call format with different path patterns."""
     env = unittest.begin(ctx)
 
-    # Test with workspace-relative path
     mock_agent = struct(short_path = "maven/kover-agent-1.0.jar")
-    mock_args = struct(short_path = "pkg/test.args")
 
-    result = get_kover_jvm_flags([mock_agent], mock_args)
+    result = kover_jvm_flags_setup([mock_agent], "pkg", "test")
 
-    # Verify the format includes both bootclasspath and javaagent flags
-    asserts.true(env, "-Xbootclasspath/a:" in result)
-    asserts.true(env, "-javaagent:" in result)
-    asserts.true(env, "=file:" in result)
-    asserts.true(env, result.endswith("pkg/test.args"))
+    # Verify the call uses the first agent file and quotes all three arguments.
+    asserts.true(env, result.startswith("_setup_kover "))
+    asserts.true(env, '"maven/kover-agent-1.0.jar"' in result)
+    asserts.true(env, '"pkg"' in result)
+    asserts.true(env, result.endswith('"test"'))
 
     return unittest.end(env)
 
-kover_jvm_flags_format_test = unittest.make(_kover_jvm_flags_format_test_impl)
+_kover_jvm_flags_setup_format_test = unittest.make(_kover_jvm_flags_setup_format_test_impl)
 
 def kover_test_suite(name):
     """Create the test suite for Kover integration tests.
@@ -63,6 +59,6 @@ def kover_test_suite(name):
     """
     unittest.suite(
         name,
-        get_kover_jvm_flags_test,
-        kover_jvm_flags_format_test,
+        _kover_jvm_flags_setup_test,
+        _kover_jvm_flags_setup_format_test,
     )

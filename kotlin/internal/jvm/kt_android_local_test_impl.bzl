@@ -76,11 +76,10 @@ load(
 )
 load(
     "//kotlin/internal/jvm:kover.bzl",
-    _create_kover_agent_actions = "create_kover_agent_actions",
     _create_kover_metadata_action = "create_kover_metadata_action",
     _get_kover_agent_files = "get_kover_agent_file",
-    _get_kover_jvm_flags = "get_kover_jvm_flags",
     _is_kover_enabled = "is_kover_enabled",
+    _kover_jvm_flags_setup = "kover_jvm_flags_setup",
 )
 
 _JACOCOCO_CLASS = "com.google.testing.coverage.JacocoCoverageRunner"
@@ -142,18 +141,13 @@ def _process_jvm(ctx, resources_ctx, **_unused_sub_ctxs):
     if ctx.configuration.coverage_enabled:
         if _is_kover_enabled(ctx):
             kover_agent_files = _get_kover_agent_files(ctx)
-            kover_output_file, kover_args_file = _create_kover_agent_actions(ctx, ctx.attr.name)
             kover_output_metadata_file = _create_kover_metadata_action(
                 ctx,
                 ctx.attr.name,
                 ctx.attr.deps + ctx.attr.associates,
-                kover_output_file,
             )
 
-            flags = _get_kover_jvm_flags(kover_agent_files, kover_args_file)
-            jvm_flags.append(flags)
-
-            transitive.extend([depset(kover_agent_files), depset([kover_args_file]), depset([kover_output_metadata_file])])
+            transitive.extend([depset(kover_agent_files), depset([kover_output_metadata_file])])
 
             java_start_class = ctx.attr.main_class
             coverage_start_class = None
@@ -336,10 +330,16 @@ def _create_stub(
         subs["%set_jacoco_main_class%"] = ""
         subs["%set_jacoco_java_runfiles_root%"] = ""
 
+    if ctx.configuration.coverage_enabled and _is_kover_enabled(ctx):
+        kover_agent_files = _get_kover_agent_files(ctx)
+        subs["%kover_jvm_flags_setup%"] = _kover_jvm_flags_setup(kover_agent_files, ctx.label.package, ctx.attr.name)
+    else:
+        subs["%kover_jvm_flags_setup%"] = ""
+
     subs.update(substitutes)
 
     ctx.actions.expand_template(
-        template = _utils.only(_get_android_toolchain(ctx).java_stub.files.to_list()),
+        template = ctx.attr.java_stub_template.files.to_list()[0],
         output = stub_file,
         substitutions = subs,
         is_executable = True,
