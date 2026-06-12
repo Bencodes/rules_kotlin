@@ -27,11 +27,10 @@ load(
 )
 load(
     "//kotlin/internal/jvm:kover.bzl",
-    _create_kover_agent_actions = "create_kover_agent_actions",
     _create_kover_metadata_action = "create_kover_metadata_action",
     _get_kover_agent_files = "get_kover_agent_file",
-    _get_kover_jvm_flags = "get_kover_jvm_flags",
     _is_kover_enabled = "is_kover_enabled",
+    _write_kover_coverage_launcher = "write_kover_coverage_launcher",
 )
 load(
     "//kotlin/internal/utils:utils.bzl",
@@ -250,9 +249,21 @@ def _write_launcher_action(ctx, rjars, main_class, jvm_flags, is_test = False):
         ["${RUNPATH}%s" % (j.short_path) for j in rjars.to_list()],
     )
 
+    # For `bazel coverage` with Kover, expand the stock launcher into a side file
+    # and make the executable a thin wrapper that enables the agent at runtime
+    # (see write_kover_coverage_launcher). This keeps the shared stub template
+    # stock instead of threading Kover-specific logic through it.
+    kover_coverage = is_test and ctx.configuration.coverage_enabled and _is_kover_enabled(ctx)
+    launcher_output = ctx.outputs.executable
+    if kover_coverage:
+        launcher_output = ctx.actions.declare_file(
+            ctx.label.name + "_kover_launcher",
+            sibling = ctx.outputs.executable,
+        )
+
     ctx.actions.expand_template(
         template = template,
-        output = ctx.outputs.executable,
+        output = launcher_output,
         substitutions = {
             "%classpath%": classpath,
             "%java_start_class%": main_class,
@@ -269,6 +280,19 @@ def _write_launcher_action(ctx, rjars, main_class, jvm_flags, is_test = False):
         },
         is_executable = True,
     )
+
+    if kover_coverage:
+        _write_kover_coverage_launcher(
+            ctx,
+            ctx.outputs.executable,
+            launcher_output,
+            _get_kover_agent_files(ctx),
+        )
+
+        # The inner launcher must ride along in the test's runfiles so the
+        # wrapper can exec it.
+        return struct(coverage_metadata = [launcher_output], executable = None)
+
     return struct(coverage_metadata = [], executable = None)
 
 # buildifier: disable=unused-variable
@@ -419,19 +443,13 @@ def kt_jvm_junit_test_impl(ctx):
     if ctx.configuration.coverage_enabled:
         if _is_kover_enabled(ctx):
             kover_agent_files = _get_kover_agent_files(ctx)
-            kover_output_file, kover_args_file = _create_kover_agent_actions(ctx, ctx.attr.name)
             kover_output_metadata_file = _create_kover_metadata_action(
                 ctx,
                 ctx.attr.name,
                 ctx.attr.deps + ctx.attr.associates,
-                kover_output_file,
             )
-            flags = _get_kover_jvm_flags(kover_agent_files, kover_args_file)
-
-            # add Kover agent jvm_flag, inputs and outputs
-            coverage_jvm_flags = [flags]
             coverage_inputs = [depset(kover_agent_files)]
-            coverage_runfiles = [kover_args_file, kover_output_metadata_file]
+            coverage_runfiles = [kover_output_metadata_file]
         else:
             jacocorunner = ctx.toolchains[_TOOLCHAIN_TYPE].jacocorunner
             coverage_runfiles = jacocorunner.files.to_list()

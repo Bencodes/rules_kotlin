@@ -75,61 +75,76 @@ def get_kover_agent_file(ctx):
     kover_agent_info = kover_agent[DefaultInfo]
     return kover_agent_info.files.to_list()
 
-def get_kover_jvm_flags(kover_agent_files, kover_args_file):
-    """Compute the jvm flags used to setup Kover agent.
+# Thin wrapper launcher used only for `bazel coverage` runs with Kover enabled.
+#
+# Kover's JVM agent reads an arguments file whose `report.file` value is taken
+# literally (no environment-variable expansion), and that file must live under
+# TEST_UNDECLARED_OUTPUTS_DIR so Bazel collects the binary report. Since that
+# directory only exists at runtime, we build the args file here, enable the
+# agent via JAVA_TOOL_OPTIONS (honored natively by the JVM, so the stock
+# launcher template needs no Kover-specific changes), then exec the real
+# launcher. JAVA_RUNFILES/TEST_SRCDIR are pre-set by Bazel for tests, and the
+# exec'd launcher also recovers them from the `.runfiles/` segment in its path.
+_KOVER_LAUNCHER_TEMPLATE = """#!/usr/bin/env bash
+set -o posix
+
+if [[ -n "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then
+  _kover_args="$(mktemp)"
+  mkdir -p "${TEST_UNDECLARED_OUTPUTS_DIR}/@REPORT_DIR@"
+  echo "report.file=${TEST_UNDECLARED_OUTPUTS_DIR}/@REPORT_DIR@/@REPORT_NAME@" > "${_kover_args}"
+  export JAVA_TOOL_OPTIONS="-Xbootclasspath/a:@AGENT@ -javaagent:@AGENT@=file:${_kover_args}${JAVA_TOOL_OPTIONS:+ ${JAVA_TOOL_OPTIONS}}"
+fi
+
+_runfiles="${JAVA_RUNFILES:-${TEST_SRCDIR}}"
+exec "${_runfiles}/@WORKSPACE@/@INNER@" "$@"
+"""
+
+def kover_coverage_launcher_script(report_dir, report_name, agent, workspace, inner):
+    """Build the Kover coverage wrapper launcher script.
+
+    Kept as a pure string builder, separate from the action, so it can be unit
+    tested.
 
     Args:
-        kover_agent_files: List of Kover agent files.
-        kover_args_file: The Kover arguments file.
+        report_dir: Package-relative directory (ctx.label.package) for the report.
+        report_name: File name of the binary (.ic) coverage report.
+        agent: Runfiles short_path of the Kover JVM agent jar.
+        workspace: The workspace name (ctx.workspace_name).
+        inner: Runfiles short_path of the stock launcher to exec.
 
     Returns:
-        The flag string to be used by test runner JVM.
+        The wrapper script contents.
     """
-    jvm_args = [
-        "-Xbootclasspath/a:%s" % (kover_agent_files[0].short_path),
-        "-javaagent:%s=file:%s" % (kover_agent_files[0].short_path, kover_args_file.short_path),
-    ]
-    return " ".join(jvm_args)
+    content = _KOVER_LAUNCHER_TEMPLATE
+    content = content.replace("@REPORT_DIR@", report_dir)
+    content = content.replace("@REPORT_NAME@", report_name)
+    content = content.replace("@AGENT@", agent)
+    content = content.replace("@WORKSPACE@", workspace)
+    content = content.replace("@INNER@", inner)
+    return content
 
-def create_kover_agent_actions(ctx, name):
-    """Generate the actions needed to emit Kover code coverage metadata file.
-
-    Creates the properly populated arguments input file needed by Kover agent.
+def write_kover_coverage_launcher(ctx, output, inner_launcher, kover_agent_files):
+    """Write the thin wrapper launcher that enables the Kover agent at runtime.
 
     Args:
         ctx: The rule context.
-        name: The name of the target.
-
-    Returns:
-        A tuple of (kover_output_file, kover_args_file).
+        output: File to write; becomes the test executable.
+        inner_launcher: The stock launcher this wrapper execs.
+        kover_agent_files: The Kover agent runtime files.
     """
-
-    # declare code coverage raw data binary output file
-    binary_output_name = "%s-kover_report.ic" % name
-    kover_output_file = ctx.actions.declare_file(binary_output_name)
-
-    # Hack: there is curently no way to indicate this file will be created Kover agent
-    ctx.actions.run_shell(
-        outputs = [kover_output_file],
-        command = "touch {}".format(kover_output_file.path),
-    )
-
-    # declare args file - https://kotlin.github.io/kotlinx-kover/jvm-agent/#kover-jvm-arguments-file
-    kover_args_file = ctx.actions.declare_file(
-        "%s-kover.args.txt" % name,
-    )
     ctx.actions.write(
-        kover_args_file,
-        "report.file=../../%s" % binary_output_name,  # Kotlin compiler runs in runfiles folder, make sure file is created is correct location
+        output = output,
+        is_executable = True,
+        content = kover_coverage_launcher_script(
+            report_dir = ctx.label.package,
+            report_name = "%s-kover_report.ic" % ctx.attr.name,
+            agent = kover_agent_files[0].short_path,
+            workspace = ctx.workspace_name,
+            inner = inner_launcher.short_path,
+        ),
     )
 
-    return kover_output_file, kover_args_file
-
-def create_kover_metadata_action(
-        ctx,
-        name,
-        deps,
-        kover_output_file):
+def create_kover_metadata_action(ctx, name, deps):
     """Generate kover metadata file needed for invoking kover CLI to generate report.
 
     More info at: https://kotlin.github.io/kotlinx-kover/cli/
@@ -138,7 +153,6 @@ def create_kover_metadata_action(
         ctx: The rule context.
         name: The name of the target.
         deps: The dependencies to collect coverage for.
-        kover_output_file: The Kover output file.
 
     Returns:
         The kover output metadata file.
@@ -177,8 +191,6 @@ def create_kover_metadata_action(
         excludes.extend(["--excludeInheritedFrom", exclude_inherited_from])
 
     ctx.actions.write(kover_output_metadata_file, "\n".join([
-        "report",
-        kover_output_file.path,
         "--title",
         "Code-Coverage Analysis: %s" % ctx.label,
     ] + srcs + classfiles + excludes))

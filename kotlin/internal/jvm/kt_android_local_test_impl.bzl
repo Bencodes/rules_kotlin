@@ -76,11 +76,10 @@ load(
 )
 load(
     "//kotlin/internal/jvm:kover.bzl",
-    _create_kover_agent_actions = "create_kover_agent_actions",
     _create_kover_metadata_action = "create_kover_metadata_action",
     _get_kover_agent_files = "get_kover_agent_file",
-    _get_kover_jvm_flags = "get_kover_jvm_flags",
     _is_kover_enabled = "is_kover_enabled",
+    _write_kover_coverage_launcher = "write_kover_coverage_launcher",
 )
 
 _JACOCOCO_CLASS = "com.google.testing.coverage.JacocoCoverageRunner"
@@ -142,18 +141,13 @@ def _process_jvm(ctx, resources_ctx, **_unused_sub_ctxs):
     if ctx.configuration.coverage_enabled:
         if _is_kover_enabled(ctx):
             kover_agent_files = _get_kover_agent_files(ctx)
-            kover_output_file, kover_args_file = _create_kover_agent_actions(ctx, ctx.attr.name)
             kover_output_metadata_file = _create_kover_metadata_action(
                 ctx,
                 ctx.attr.name,
                 ctx.attr.deps + ctx.attr.associates,
-                kover_output_file,
             )
 
-            flags = _get_kover_jvm_flags(kover_agent_files, kover_args_file)
-            jvm_flags.append(flags)
-
-            transitive.extend([depset(kover_agent_files), depset([kover_args_file]), depset([kover_output_metadata_file])])
+            transitive.extend([depset(kover_agent_files), depset([kover_output_metadata_file])])
 
             java_start_class = ctx.attr.main_class
             coverage_start_class = None
@@ -257,10 +251,19 @@ def _process_stub(ctx, deploy_jar_ctx, jvm_ctx, stub_preprocess_ctx, **_unused_s
              ". Explicitly set test_class or move this source file to " +
              "a java source root.")
 
+    # For `bazel coverage` with Kover, expand the stock stub into a side file and
+    # make the executable a thin wrapper that enables the agent at runtime (see
+    # write_kover_coverage_launcher). Keeps the rules_android stub template stock.
+    kover_coverage = ctx.configuration.coverage_enabled and _is_kover_enabled(ctx)
+    stub_output = stub
+    if kover_coverage:
+        stub_output = ctx.actions.declare_file(ctx.label.name + "_kover_launcher")
+        runfiles.append(stub_output)
+
     _create_stub(
         ctx,
         stub_preprocess_ctx.substitutes,
-        stub,
+        stub_output,
         classpath_file,
         deploy_jar_ctx.classpath,
         _get_jvm_flags(ctx, test_class, jvm_ctx.android_properties_file, jvm_ctx.additional_jvm_flags),
@@ -268,6 +271,15 @@ def _process_stub(ctx, deploy_jar_ctx, jvm_ctx, stub_preprocess_ctx, **_unused_s
         jvm_ctx.coverage_start_class,
         merged_instr,
     )
+
+    if kover_coverage:
+        _write_kover_coverage_launcher(
+            ctx,
+            stub,
+            stub_output,
+            _get_kover_agent_files(ctx),
+        )
+
     return _ProviderInfo(
         name = "stub_ctx",
         value = struct(

@@ -15,45 +15,75 @@
 """Tests for Kover code coverage integration."""
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
-load("//kotlin/internal/jvm:kover.bzl", "get_kover_jvm_flags")
+load("//kotlin/internal/jvm:kover.bzl", "kover_coverage_launcher_script")
 
-def _get_kover_jvm_flags_test_impl(ctx):
-    """Test that get_kover_jvm_flags generates correct JVM agent flags including bootclasspath."""
+def _kover_coverage_launcher_script_test_impl(ctx):
+    """Test that the wrapper writes the args file into TEST_UNDECLARED_OUTPUTS_DIR and enables the agent."""
     env = unittest.begin(ctx)
 
-    # Create mock file objects with short_path attribute
-    mock_agent_file = struct(short_path = "external/kover/kover-jvm-agent.jar")
-    mock_args_file = struct(short_path = "bazel-out/k8-fastbuild/bin/test-kover.args.txt")
+    result = kover_coverage_launcher_script(
+        report_dir = "path/to/pkg",
+        report_name = "my_test-kover_report.ic",
+        agent = "external/kover/kover-jvm-agent.jar",
+        workspace = "my_workspace",
+        inner = "path/to/pkg/my_test_kover_launcher",
+    )
 
-    result = get_kover_jvm_flags([mock_agent_file], mock_args_file)
+    # The binary report lands under the runtime-only undeclared outputs dir so
+    # Bazel collects it.
+    asserts.true(
+        env,
+        "report.file=${TEST_UNDECLARED_OUTPUTS_DIR}/path/to/pkg/my_test-kover_report.ic" in result,
+        "expected report.file under TEST_UNDECLARED_OUTPUTS_DIR, got:\n" + result,
+    )
+    asserts.true(
+        env,
+        'mkdir -p "${TEST_UNDECLARED_OUTPUTS_DIR}/path/to/pkg"' in result,
+        "expected report directory to be created, got:\n" + result,
+    )
 
-    # Expected format includes both -Xbootclasspath/a and -javaagent flags
-    expected = "-Xbootclasspath/a:external/kover/kover-jvm-agent.jar -javaagent:external/kover/kover-jvm-agent.jar=file:bazel-out/k8-fastbuild/bin/test-kover.args.txt"
-    asserts.equals(env, expected, result)
+    # The agent is enabled via JAVA_TOOL_OPTIONS (no stub-template changes needed).
+    asserts.true(env, "-Xbootclasspath/a:external/kover/kover-jvm-agent.jar" in result)
+    asserts.true(env, "-javaagent:external/kover/kover-jvm-agent.jar=file:${_kover_args}" in result)
+    asserts.true(env, "export JAVA_TOOL_OPTIONS=" in result)
+
+    # The wrapper execs the stock launcher from the runfiles tree.
+    asserts.true(
+        env,
+        'exec "${_runfiles}/my_workspace/path/to/pkg/my_test_kover_launcher" "$@"' in result,
+        "expected exec of the inner launcher, got:\n" + result,
+    )
 
     return unittest.end(env)
 
-get_kover_jvm_flags_test = unittest.make(_get_kover_jvm_flags_test_impl)
+_kover_coverage_launcher_script_test = unittest.make(_kover_coverage_launcher_script_test_impl)
 
-def _kover_jvm_flags_format_test_impl(ctx):
-    """Test JVM flags format with different path patterns."""
+def _kover_coverage_launcher_script_guarded_test_impl(ctx):
+    """Test that the agent setup is guarded on TEST_UNDECLARED_OUTPUTS_DIR being set."""
     env = unittest.begin(ctx)
 
-    # Test with workspace-relative path
-    mock_agent = struct(short_path = "maven/kover-agent-1.0.jar")
-    mock_args = struct(short_path = "pkg/test.args")
+    result = kover_coverage_launcher_script(
+        report_dir = "pkg",
+        report_name = "test-kover_report.ic",
+        agent = "maven/kover-agent-1.0.jar",
+        workspace = "ws",
+        inner = "pkg/test_kover_launcher",
+    )
 
-    result = get_kover_jvm_flags([mock_agent], mock_args)
+    # Setup only runs under coverage (the variable is set), so `bazel run` of the
+    # target does not try to create a directory at the filesystem root.
+    asserts.true(env, 'if [[ -n "${TEST_UNDECLARED_OUTPUTS_DIR:-}" ]]; then' in result)
 
-    # Verify the format includes both bootclasspath and javaagent flags
-    asserts.true(env, "-Xbootclasspath/a:" in result)
-    asserts.true(env, "-javaagent:" in result)
-    asserts.true(env, "=file:" in result)
-    asserts.true(env, result.endswith("pkg/test.args"))
+    # All placeholders are substituted; none leak into the generated script.
+    asserts.false(env, "@REPORT_DIR@" in result)
+    asserts.false(env, "@REPORT_NAME@" in result)
+    asserts.false(env, "@AGENT@" in result)
+    asserts.false(env, "@WORKSPACE@" in result)
+    asserts.false(env, "@INNER@" in result)
 
     return unittest.end(env)
 
-kover_jvm_flags_format_test = unittest.make(_kover_jvm_flags_format_test_impl)
+_kover_coverage_launcher_script_guarded_test = unittest.make(_kover_coverage_launcher_script_guarded_test_impl)
 
 def kover_test_suite(name):
     """Create the test suite for Kover integration tests.
@@ -63,6 +93,6 @@ def kover_test_suite(name):
     """
     unittest.suite(
         name,
-        get_kover_jvm_flags_test,
-        kover_jvm_flags_format_test,
+        _kover_coverage_launcher_script_test,
+        _kover_coverage_launcher_script_guarded_test,
     )
