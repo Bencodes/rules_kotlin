@@ -104,6 +104,53 @@ def _ksp_single_action_test_impl(ctx):
 
 ksp_single_action_test = analysistest.make(_ksp_single_action_test_impl)
 
+def _ksp_abi_jar_test_impl(ctx):
+    """Verify KSP2 generated classes are stripped to an ijar and folded into the compile (ABI) jar."""
+    env = analysistest.begin(ctx)
+
+    actions = analysistest.target_actions(env)
+
+    # An ijar action should strip the KSP generated-classes jar down to an interface jar so the
+    # directly-emitted classes participate in compile-avoidance.
+    ksp_ijar_actions = [
+        a
+        for a in actions
+        if a.mnemonic == "JavaIjar" and
+           any([i.path.endswith("-ksp-genclasses.jar") for i in a.inputs.to_list()])
+    ]
+    asserts.equals(
+        env,
+        1,
+        len(ksp_ijar_actions),
+        "Expected exactly one ijar action over the KSP generated-classes jar",
+    )
+
+    # The resulting ijar (not the full classes jar) must be folded into the compile (ABI) jar.
+    abi_fold_actions = [a for a in actions if a.mnemonic == "KotlinFoldJarsAbi"]
+    asserts.equals(env, 1, len(abi_fold_actions), "Expected exactly one Abi fold action")
+
+    if ksp_ijar_actions and abi_fold_actions:
+        ksp_ijars = ksp_ijar_actions[0].outputs.to_list()
+        fold_inputs = abi_fold_actions[0].inputs.to_list()
+        for ijar in ksp_ijars:
+            asserts.true(
+                env,
+                ijar in fold_inputs,
+                "KSP generated-classes ijar %s should be folded into the compile jar" % ijar.path,
+            )
+
+        # The full (unstripped) classes jar must NOT be in the compile jar; it belongs to runtime.
+        for fold_input in fold_inputs:
+            asserts.false(
+                env,
+                fold_input.path.endswith("-ksp-genclasses.jar"),
+                "Full KSP classes jar should not be folded into the compile jar: %s" % fold_input.path,
+            )
+
+    return analysistest.end(env)
+
+ksp_abi_jar_test = analysistest.make(_ksp_abi_jar_test_impl)
+
 def _ksp_plugin_options_provider_test_impl(ctx):
     """Verify kt_ksp_plugin with options carries them in KspPluginInfo."""
     env = analysistest.begin(ctx)
@@ -314,6 +361,7 @@ def ksp_test_suite(name):
             ":ksp_outputs_test",
             ":ksp_action_test",
             ":ksp_single_action_test",
+            ":ksp_abi_jar_test",
             ":ksp_plugin_options_provider_test",
             ":ksp_plugin_empty_options_provider_test",
             ":ksp_options_action_test",

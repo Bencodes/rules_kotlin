@@ -458,7 +458,9 @@ def _run_ksp_builder_actions(
     This eliminates tree artifacts and reduces the action count to a single action.
 
     Returns:
-        A struct containing KSP outputs (two JAR files: sources and classes)
+        A struct containing KSP outputs: the generated sources jar, the generated
+        classes jar (runtime), and an interface (ABI) jar derived from the generated
+        classes so they participate in the target's compile jar.
     """
 
     # Output JARs - the worker creates these directly
@@ -551,8 +553,20 @@ def _run_ksp_builder_actions(
         toolchain = _TOOLCHAIN_TYPE,
     )
 
+    # Strip the directly-generated classes down to an interface (ABI) jar. KSP-generated *sources*
+    # are recompiled by kotlinc and already captured in the kt ABI jar, but classes a processor
+    # emits directly otherwise never reach the target's compile jar, breaking compile-avoidance for
+    # downstream consumers. Folding this ijar into compile_jars exposes them.
+    ksp_generated_class_abi_jar = java_common.run_ijar(
+        ctx.actions,
+        jar = ksp_generated_classes_jar,
+        target_label = ctx.label,
+        java_toolchain = toolchains.java,
+    )
+
     return struct(
         ksp_generated_class_jar = ksp_generated_classes_jar,
+        ksp_generated_class_abi_jar = ksp_generated_class_abi_jar,
         ksp_generated_src_jar = ksp_generated_java_srcjar,
     )
 
@@ -972,6 +986,10 @@ def _run_kt_java_builder_actions(
         )
         ksp_generated_class_jar = ksp_outputs.ksp_generated_class_jar
         output_jars.append(ksp_generated_class_jar)
+
+        # Fold the generated-classes ABI jar into the target's compile jar so directly-generated
+        # classes are visible to downstream compilation (compile-avoidance).
+        compile_jars.append(ksp_outputs.ksp_generated_class_abi_jar)
         ksp_generated_src_jar = ksp_outputs.ksp_generated_src_jar
         generated_ksp_src_jars.append(ksp_generated_src_jar)
 
