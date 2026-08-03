@@ -361,7 +361,7 @@ def _build_resourcejar_action(ctx, extra_resources = {}):
     )
     return resources_jar_output
 
-def _run_merge_jdeps_action(ctx, toolchains, jdeps, outputs, deps, associate_jars = depset()):
+def _run_merge_jdeps_action(ctx, toolchains, jdeps, outputs, deps, associate_jars = depset(), classpath_jars = None):
     """Creates a Jdeps merger action invocation."""
     args = ctx.actions.args()
     args.set_param_file_format("multiline")
@@ -384,13 +384,24 @@ def _run_merge_jdeps_action(ctx, toolchains, jdeps, outputs, deps, associate_jar
     inputs = depset(jdeps)
     if not toolchains.kt.experimental_report_unused_deps == "off":
         # For sandboxing to work, and for this action to be deterministic, the compile jars need to be passed as inputs.
-        # The associate jars are included as well because the merger reads the owning label out of the manifest of every
-        # jar mentioned in the jdeps, and the jar the associate contributed to the classpath is not necessarily its
-        # compile jar, see associates.bzl.
-        inputs = depset(
-            jdeps,
-            transitive = [dep.transitive_compile_time_jars for dep in deps] + [associate_jars],
-        )
+        # The merger opens every jar the merged jdeps name, and a jdeps entry can only name a jar that was on the
+        # compile classpath (used entries) or in --direct_dependencies (unused entries), so callers that know the
+        # classpath pass it instead of the whole transitive closure. The direct compile jars have to come along: with
+        # private class removal an associate contributes its class jar to the classpath while its compile jar stays in
+        # --direct_dependencies, and so shows up as an unused entry pointing at a jar the classpath does not carry.
+        if classpath_jars != None:
+            inputs = depset(
+                jdeps,
+                transitive = [classpath_jars, associate_jars] + [dep.compile_jars for dep in deps],
+            )
+        else:
+            # The associate jars are included as well because the merger reads the owning label out of the manifest of
+            # every jar mentioned in the jdeps, and the jar the associate contributed to the classpath is not
+            # necessarily its compile jar, see associates.bzl.
+            inputs = depset(
+                jdeps,
+                transitive = [dep.transitive_compile_time_jars for dep in deps] + [associate_jars],
+            )
 
     ctx.actions.run(
         mnemonic = mnemonic,
@@ -1068,7 +1079,8 @@ def _run_kt_java_builder_actions(
     # If there is Java source or KAPT/KSP generated Java source compile that Java and fold it into
     # the final ABI jar. Otherwise just use the KT ABI jar as final ABI jar.
     ksp_generated_java_src_jars = generated_ksp_src_jars and is_ksp_processor_generating_java(ctx.attr.plugins)
-    if srcs.java or generated_kapt_src_jars or srcs.src_jars or ksp_generated_java_src_jars:
+    compiles_java = bool(srcs.java or generated_kapt_src_jars or srcs.src_jars or ksp_generated_java_src_jars)
+    if compiles_java:
         javac_opts = javac_options_to_flags(ctx.attr.javac_opts[JavacOptions] if ctx.attr.javac_opts else toolchains.kt.javac_options)
         javac_opts.extend([
             flag
@@ -1141,6 +1153,9 @@ def _run_kt_java_builder_actions(
                 deps = compile_deps.deps,
                 associate_jars = compile_deps.associate_jars,
                 outputs = {"output": output_jdeps},
+                # javac compiles against the unpruned transitive classpath, so its jdeps can name
+                # jars outside the Kotlin compile classpath.
+                classpath_jars = None if compiles_java else compile_deps.compile_jars,
             )
         else:
             ctx.actions.symlink(
