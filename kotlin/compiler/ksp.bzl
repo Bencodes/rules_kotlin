@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Repository macros for the KSP compiler plugin."""
 
 load("//kotlin:jvm.bzl", "kt_jvm_import")
 load(
@@ -20,6 +21,7 @@ load(
 
 _KSP_COMPILER_PLUGIN_REPO_PREFIX = "@" + _KSP_COMPILER_PLUGIN_REPO + "//:"
 
+# buildifier: disable=unnamed-macro
 def kt_configure_ksp():
     """
     Defines the toolchain_type and default toolchain for KSP plugins.

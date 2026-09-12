@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Macros for generating kotlin compiler dependencies."""
 
 load("@com_github_jetbrains_kotlin//:artifacts.bzl", "KOTLINC_ARTIFACTS")
 load("//kotlin:jvm.bzl", "kt_jvm_import")
@@ -52,6 +53,7 @@ def _import_labels(labels, rule_kind, **rule_args):
             args["srcjar"] = "@%s//:%s" % (_KT_COMPILER_REPO, sources)
         rule_kind(**args)
 
+# buildifier: disable=unnamed-macro
 def kt_configure_compiler():
     """
     Defines the toolchain_type and default toolchain for kotlin compilation.
