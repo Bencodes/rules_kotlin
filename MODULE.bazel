@@ -168,3 +168,13 @@ use_repo(
     "build_bazel_bazel_7_x",
     "build_bazel_bazel_8_x",
 )
+
+# Same agent version as the example in Kover PR #1729.
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "kover_test_agent",
+    downloaded_file_path = "kover-jvm-agent-0.8.3.jar",
+    sha256 = "3c07bdf995edce414d078dbd9725cd78c49f9cce871831264d09fa1f7ea067ed",
+    urls = ["https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kover-jvm-agent/0.8.3/kover-jvm-agent-0.8.3.jar"],
+)

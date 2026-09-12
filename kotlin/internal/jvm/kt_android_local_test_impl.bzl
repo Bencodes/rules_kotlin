@@ -69,6 +69,14 @@ load(
     "//kotlin/internal/jvm:jvm_deps.bzl",
     _jvm_deps_utils = "jvm_deps_utils",
 )
+load(
+    "//kotlin/internal/jvm:kover.bzl",
+    _create_kover_agent_actions = "create_kover_agent_actions",
+    _create_kover_metadata_action = "create_kover_metadata_action",
+    _get_kover_agent_file = "get_kover_agent_file",
+    _get_kover_jvm_flags = "get_kover_jvm_flags",
+    _is_kover_enabled = "is_kover_enabled",
+)
 
 _JACOCOCO_CLASS = "com.google.testing.coverage.JacocoCoverageRunner"
 
@@ -112,6 +120,26 @@ def _process_resources(ctx, java_package, manifest_ctx, **_unused_sub_ctxs):
 
 def _process_coverage(ctx, **_unused_sub_ctxs):
     """Selects the Kotlin toolchain's coverage runtime independently of compilation."""
+    if ctx.configuration.coverage_enabled and _is_kover_enabled(ctx):
+        agent = _get_kover_agent_file(ctx)
+        output, args = _create_kover_agent_actions(ctx, ctx.label.name)
+        metadata = _create_kover_metadata_action(
+            ctx,
+            ctx.label.name,
+            ctx.attr.deps + ctx.attr.associates,
+            output,
+        )
+        return _ProviderInfo(
+            name = "coverage_ctx",
+            value = struct(
+                deps = [],
+                java_start_class = ctx.attr.main_class,
+                coverage_start_class = None,
+                additional_jvm_flags = _get_kover_jvm_flags(agent, args),
+            ),
+            runfiles = ctx.runfiles(files = [agent, args, metadata]),
+        )
+
     deps = []
     if ctx.configuration.coverage_enabled:
         deps.append(ctx.toolchains[_TOOLCHAIN_TYPE].jacocorunner)
